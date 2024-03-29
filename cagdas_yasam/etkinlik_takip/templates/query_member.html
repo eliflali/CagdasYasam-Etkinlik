@@ -1,0 +1,21 @@
+<!-- query_member.html -->
+{% extends "base.html" %} {% load static %} {% block content %}
+<div class="container">
+  <h2>Üye Sorgula</h2>
+  <form method="get">
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Ara</button>
+  </form>
+  {% if members %}
+  <ul>
+    {% for member in members %}
+    <li>
+      {{ member.name }} - {{ member.mission }} - {{ member.school }} - ...
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>Üye bulunamadı.</p>
+  {% endif %}
+</div>
+{% endblock %}

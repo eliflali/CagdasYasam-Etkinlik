@@ -1,0 +1,57 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<style>
+  .header div {
+    margin-bottom: 1rem;
+  }
+  .header a {
+    display: inline-block;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    margin-right: 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+  }
+  .header a:hover {
+    background-color: #0056b3;
+  }
+  h2 {
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+  ul li {
+    background-color: #f8f9fa;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  ul li:nth-child(odd) {
+    background-color: #e9ecef;
+  }
+</style>
+
+<div class="header">
+  <div>
+    <a href="{% url 'add_member' %}">Üye Ekle</a>
+    <a href="{% url 'query_member' %}">Üye Sorgula</a>
+  </div>
+</div>
+<div>
+  <h2>Incoming Events</h2>
+  <ul>
+    {% for event in events %}
+    <li>
+      {{ event.name }} - {{ event.date }} - {{ event.point }} Points - {{
+      event.place }}
+    </li>
+    {% empty %}
+    <li>No upcoming events.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+<!-- member_detail.html -->
+{% extends "base.html" %} {% load static %} {% block content %}
+<div class="container">
+  <h2>Member Details</h2>
+  <form method="post" id="memberForm">
+    {% csrf_token %} {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Update</button>
+  </form>
+</div>
+<script>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const formFields = document.querySelectorAll('#memberForm input, #memberForm select');
+        
+            formFields.forEach(field => {
+                const editIcon = document.createElement('i'); // Create the edit icon
+                editIcon.className = 'edit-icon'; // Add your custom icon class here
+                editIcon.addEventListener('click', function() {
+                    field.removeAttribute('disabled'); // Enable the field for editing
+                    // Change the icon to a save icon
+                    editIcon.className = 'save-icon'; // Change to your save icon class here
+                });
+                
+                // Append the edit icon to the parent of the field, or wherever you want it to appear
+                field.parentNode.appendChild(editIcon);
+            });
+        });
+        </script>
+</script>
+{% endblock %}
