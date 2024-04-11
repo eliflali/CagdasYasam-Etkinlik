@@ -27,3 +27,11 @@ class Member(models.Model):
 
     def __str__(self):
         return self.name
+    
+class EventAttendance(models.Model):
+    member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name='attended_events')
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='attending_members')
+    points_gained = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.member.name} attended {self.event.name}"

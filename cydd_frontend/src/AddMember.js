@@ -26,11 +26,38 @@ const AddMemberForm = () => {
         }));
     };
 
+    // New state for managing notification
+    const [notification, setNotification] = useState('');
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const response = await axios.post('http://localhost:8000/members/', formData);
             console.log('Member added:', response.data);
+
+            // Set notification
+            setNotification("Üye kaydedildi.");
+
+            // Clear form fields
+            setFormData({
+                name: '',
+                mission: '',
+                school: '',
+                department: '',
+                student_class: '',
+                group: '',
+                phone_number: '',
+                email: '',
+                tc_number: '',
+                active: true,
+                points_collected: 0,
+            });
+
+            // Optionally, clear notification after a few seconds
+            setTimeout(() => {
+                setNotification('');
+            }, 3000); // Clear notification after 5 seconds
+
         } catch (error) {
             console.error('There was an error adding the member:', error.response.data);
         }
@@ -180,6 +207,7 @@ const AddMemberForm = () => {
                     <button type="submit">Ekle</button>
                 </div>
         </form>
+        {notification && <div className="notification">{notification}</div>}
         </div>
         </>
     );

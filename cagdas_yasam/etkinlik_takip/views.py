@@ -11,8 +11,30 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Member
 from .serializers import MemberSerializer
+from .serializers import EventSerializer
+from .serializers import EventAttendanceSerializer
 
 
+class AddMemberToEventView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = EventAttendanceSerializer(data=request.data)
+        if serializer.is_valid():
+            # Save the EventAttendance instance
+            event_attendance = serializer.save()
+            
+            # Fetch the Member instance related to the EventAttendance
+            member = event_attendance.member
+            
+            # Update the member's points_collected
+            member.points_collected += event_attendance.points_gained
+            member.save()
+            
+            # Return the updated EventAttendance data
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        # If the serializer is not valid, return an error response
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 class MemberUpdateDeleteAPIView(APIView):
     def get_object(self, pk):
         try:
@@ -63,6 +85,53 @@ class MemberCreate(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class EventCreate(APIView):
+    def post(self, request, format=None):
+        serializer = EventSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class EventListView(APIView):
+    def get(self, request, *args, **kwargs):
+        # Retrieve query parameters
+        query_params = request.query_params
+        
+        # Filter queryset based on query parameters
+        queryset = Event.objects.all()
+        for key, value in query_params.items():
+            if value:
+                # Update the queryset to filter based on the provided parameter
+                queryset = queryset.filter(**{key: value})
+
+        serializer = EventSerializer(queryset, many=True)
+        return Response(serializer.data)
+    
+class EventUpdateDeleteAPIView(APIView):
+    def get_object(self, pk):
+        try:
+            return Event.objects.get(pk=pk)
+        except Event.DoesNotExist:
+            return None
+
+    def put(self, request, pk, format=None):
+        event = self.get_object(pk)
+        if event is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = EventSerializer(event, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        event = self.get_object(pk)
+        if event is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        event.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
 def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)

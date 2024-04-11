@@ -9,6 +9,8 @@ const MainPage = ({ events }) => {
         <div>
           <button className='button' onClick={() => window.location.href='/add_member'}>Üye Ekle</button>
           <button  className='button' onClick={() => window.location.href='/query_member'}>Üye Sorgula</button>
+          <button  className='button' onClick={() => window.location.href='/add_event'}>Etkinlik Ekle</button>
+          <button  className='button' onClick={() => window.location.href='/query_event'}>Etkinlik Sorgula</button>
         </div>
       </div>
       <div>
