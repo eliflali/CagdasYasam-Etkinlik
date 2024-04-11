@@ -1,0 +1,158 @@
+.page-container {
+  display: auto;
+  font-family: Arial, sans-serif;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  background-color: #005A9C; /* Adjust the color to match your branding */
+  color: white;
+  padding: 10px 20px;
+}
+
+.header img {
+  margin-right: 20px;
+}
+
+.header h1 {
+  font-size: 24px;
+  margin: 0;
+}
+
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.form {
+  background-color: #0555ab; /* Light grey background */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 600px; /* Limit the form width */
+  width: 100%;
+}
+
+.form p, .form label {
+  margin: 10px 0;
+}
+
+.form input[type="text"],
+.form input[type="email"],
+.form input[type="checkbox"] {
+  padding: 8px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  width: calc(100% - 16px); /* Full width minus padding */
+  box-sizing: border-box; /* Include padding and border in element's width */
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.form button {
+  background-color: #007BFF;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.form button:hover {
+  background-color: #0056b3;
+}
+
+.membersTable {
+  margin-top: 20px;
+  width: 100%;
+  background-color: #fff; /* White background for the table */
+  border-collapse: collapse;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.membersTable th, .membersTable td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #ddd; /* Light grey border */
+}
+
+.membersTable th {
+  background-color: #007BFF; /* Blue background for headers */
+  color: white;
+}
+
+.membersTable tr:nth-child(even) {
+  background-color: #f2f2f2; /* Zebra striping for rows */
+}
+
+.membersTable tr:hover {
+  background-color: #ddd; /* Hover effect for rows */
+}
+
+/* Icon styles */
+.faTrash, .faEdit, .faSave {
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.faSave {
+  color: green;
+}
+
+.faEdit {
+  color: #FFA500; /* Orange */
+}
+
+.faTrash {
+  color: red;
+}
+
+.membersTable {
+  margin-top: 20px;
+  width: 100%;
+  background-color: #fff; /* White background for the table */
+  border-collapse: collapse; /* This ensures that border lines between cells collapse into a single line */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.membersTable th, .membersTable td {
+  text-align: left;
+  padding: 12px;
+  border: 1px solid #ddd; /* Adding borders to both th and td elements */
+  color: #005A9C;
+}
+
+.membersTable th {
+  background-color: #007BFF; /* Blue background for headers */
+  color: white;
+}
+
+/* Optional: If you want to ensure there's no double border effect */
+.membersTable tr {
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+}
+
+/* To ensure the first cell of each row has a left border */
+.membersTable tr td:first-child, .membersTable tr th:first-child {
+  border-left: 1px solid #ddd;
+}
+
+/* To ensure the last cell of each row has a right border */
+.membersTable tr td:last-child, .membersTable tr th:last-child {
+  border-right: 1px solid #ddd;
+}
+
+/* Zebra striping for rows remains the same */
+.membersTable tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/* Hover effect for rows */
+.membersTable tr:hover {
+  background-color: #ddd;
+}

@@ -12,6 +12,48 @@ from rest_framework import status
 from .models import Member
 from .serializers import MemberSerializer
 
+
+class MemberUpdateDeleteAPIView(APIView):
+    def get_object(self, pk):
+        try:
+            return Member.objects.get(pk=pk)
+        except Member.DoesNotExist:
+            return None
+
+    def put(self, request, pk, format=None):
+        member = self.get_object(pk)
+        if member is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = MemberSerializer(member, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        member = self.get_object(pk)
+        if member is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        member.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class MemberListView(APIView):
+    def get(self, request, *args, **kwargs):
+        # Retrieve query parameters
+        query_params = request.query_params
+        
+        # Filter queryset based on query parameters
+        queryset = Member.objects.all()
+        for key, value in query_params.items():
+            if value:
+                # Update the queryset to filter based on the provided parameter
+                queryset = queryset.filter(**{key: value})
+
+        serializer = MemberSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+
 class MemberCreate(APIView):
     def post(self, request, format=None):
         serializer = MemberSerializer(data=request.data)
