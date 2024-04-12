@@ -10,14 +10,38 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Member
+from .models import EventAttendance
 from .serializers import MemberSerializer
 from .serializers import EventSerializer
 from .serializers import EventAttendanceSerializer
+from django.shortcuts import get_object_or_404
 
 
+class RemoveAttendeeView(APIView):
+    def delete(self, request, event_id, member_id):
+        try:
+            attendance = get_object_or_404(EventAttendance, event_id=event_id, member_id=member_id)
+            member = attendance.member
+            member.points_collected -= attendance.points_gained  # Decrease the points
+            member.save()
+            attendance.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+class EventAttendeesView(APIView):
+    def get(self, request, event_id):
+        event = get_object_or_404(Event, id=event_id)
+        attendees = EventAttendance.objects.filter(event=event)
+        serializer = EventAttendanceSerializer(attendees, many=True)
+        print(serializer.data)
+        return Response(serializer.data)
+    
 class AddMemberToEventView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = EventAttendanceSerializer(data=request.data)
+        print(request.data)
         if serializer.is_valid():
             # Save the EventAttendance instance
             event_attendance = serializer.save()
@@ -131,7 +155,13 @@ class EventUpdateDeleteAPIView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
         event.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
+class MemberDetailView(APIView):
+    def get(self, request, pk):
+        member = get_object_or_404(Member, pk=pk)
+        serializer = MemberSerializer(member)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)

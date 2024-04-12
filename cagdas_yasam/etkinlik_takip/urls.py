@@ -8,6 +8,9 @@ from .views import EventCreate
 from .views import EventListView
 from .views import EventUpdateDeleteAPIView
 from .views import AddMemberToEventView
+from .views import EventAttendeesView
+from .views import MemberDetailView
+from .views import RemoveAttendeeView
 
 urlpatterns = [
     path('members/', MemberCreate.as_view(), name='member-create'),
@@ -21,4 +24,7 @@ urlpatterns = [
     path('members/<int:pk>/', MemberUpdateDeleteAPIView.as_view(), name='member-update-delete'),
     path('events/<int:pk>/', EventUpdateDeleteAPIView.as_view(), name='event-update-delete'),
     path('add_attendance/', AddMemberToEventView.as_view(), name='add-attendance'),
-] 
+    path('events/<int:event_id>/attendees/', EventAttendeesView.as_view(), name='event-attendees'),
+    path('memberslist/<int:pk>/', MemberDetailView.as_view(), name='member-detail'),
+    path('events/<int:event_id>/remove-attendee/<int:member_id>/', RemoveAttendeeView.as_view(), name='remove-attendee'),
+]

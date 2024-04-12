@@ -1,0 +1,81 @@
+.event-details {
+
+    background-color: #f8f9fa; /* Light gray background */
+    border: 1px solid #dee2e6; /* Light gray border for some definition */
+    border-radius: 8px; /* Rounded corners */
+    padding: 20px; /* Padding around the content */
+    margin: 20px 0; /* Some margin to separate it from other content */
+    width: auto; /* Maximum width */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+}
+
+.event-details h1 {
+    display: flex;
+    align-items: center;
+    align-self: center;
+    align-content: center;
+    justify-content: center;
+    background-color: #dee2e6;
+    color: #b53e03; /* Bootstrap primary color for the heading */
+    margin-bottom: 15px; /* Space below the heading */
+}
+
+.event-details p {
+    font-size: 16px; /* Slightly larger font size for readability */
+    color: #343a40; /* Dark gray text color */
+    margin-bottom: 10px; /* Margin below each paragraph for spacing */
+}
+
+.member-name{
+    grid-row: 1;
+    color: #343a40;
+    width: 50px;
+    margin-right: 5px;
+}
+
+.add-to-event-button{
+    grid-row: 3;
+    margin-right: 0px;
+}
+
+.member-addition-list-elmt{
+    display: flex;
+    align-items: center;
+    align-self: center;
+    align-content: center;
+    justify-content: center;
+    display: -ms-inline-grid;
+}
+
+.attendee-list-name{
+    color: #e6dfde;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    align-self: center;
+    align-content: center;
+    justify-content: center;
+}
+
+.member-info{
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    align-self: center;
+    align-content: center;
+    justify-content: center;
+    color: #343a40;
+}
+
+.delete-member-button{
+    margin-left: 10px;
+    margin-right: 0px;
+
+}
+
+.attendees-list{
+    background-color: #0251a4;
+    border-radius: 8px; /* Rounded corners */
+    padding: 20px; /* Padding around the content */
+    margin: 20px 0; /* Some margin to separate it from other content */
+}

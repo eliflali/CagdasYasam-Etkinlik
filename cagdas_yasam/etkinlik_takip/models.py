@@ -33,5 +33,9 @@ class EventAttendance(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='attending_members')
     points_gained = models.IntegerField(default=0)
 
+    class Meta:
+        unique_together = ('member', 'event')  # Ensuring uniqueness
+
     def __str__(self):
         return f"{self.member.name} attended {self.event.name}"
+

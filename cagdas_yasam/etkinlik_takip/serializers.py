@@ -18,4 +18,4 @@ class EventSerializer(serializers.ModelSerializer):
 class EventAttendanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = EventAttendance
-        fields = '__all__'
+        fields = ['member', 'event', 'points_gained']
