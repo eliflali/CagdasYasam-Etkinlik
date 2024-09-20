@@ -102,6 +102,11 @@ class TargetGroup(models.Model):
 
 # Update the Event model to include the target groups
 # Helper and Native Departments must be added
+# attendant count must be added.
+# for :
+# 1 - from target group
+# 2- from us
+# explanation field must be added - must be optional
 class Event(models.Model):
     name = models.CharField(max_length=255)
     date = models.DateTimeField()
