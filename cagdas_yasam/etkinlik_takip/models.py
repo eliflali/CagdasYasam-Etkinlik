@@ -101,6 +101,7 @@ class TargetGroup(models.Model):
         return self.get_name_display()
 
 # Update the Event model to include the target groups
+# Helper and Native Departments must be added
 class Event(models.Model):
     name = models.CharField(max_length=255)
     date = models.DateTimeField()
