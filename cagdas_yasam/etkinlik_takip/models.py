@@ -38,8 +38,6 @@ class Membership(models.Model):
     def __str__(self):
         return f"{self.member.name} - {self.department.name}"
 
-
-
 class Student(models.Model):
     name = models.CharField(_("Ad"), max_length=100)
     email = models.EmailField(_("E-posta"))
@@ -71,8 +69,38 @@ class VolunteeringStudent(Student):
     def __str__(self):
         return f"{self.name} - {self.status}"
     
-    
 # Event and Attendance Models
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+# Define the TargetGroup model
+class TargetGroup(models.Model):
+    TARGET_GROUP_CHOICES = [
+        ('BURS_VERENLER', 'Burs Verenler'),
+        ('BURSLU_OGRENCILER', 'Burslu Öğrenciler'),
+        ('COCUKLAR', 'Çocuklar'),
+        ('GENCLER', 'Gençler'),
+        ('GONULLULER', 'Gönüllüler'),
+        ('KADINLAR', 'Kadınlar'),
+        ('MEDYA_KAMUOYU', 'Medya - Kamuoyu'),
+        ('OGRENCILER', 'Öğrenciler'),
+        ('KURUMSAL_SIRKETLER_STO', 'Kurumsal Şirketler - STÖ\'ler'),
+        ('RESMI_KURUMLAR_YEREL_YONETIMLER', 'Resmi Kurumlar - Yerel Yönetimler'),
+        ('OGRENCILER_YETISKINLER', 'Öğrenciler-Yetişkinler'),
+        ('UYELER', 'Üyeler'),
+        ('VELILER', 'Veliler'),
+        ('UYELER_VE_GONULLULER', 'Üyeler ve Gönüllüler'),
+        ('HALK', 'Halk'),
+        ('YONETIM_KURULU', 'Yönetim Kurulu'),
+        ('ESNAF', 'Esnaf'),
+    ]
+
+    name = models.CharField(max_length=255, choices=TARGET_GROUP_CHOICES, unique=True)
+
+    def __str__(self):
+        return self.get_name_display()
+
+# Update the Event model to include the target groups
 class Event(models.Model):
     name = models.CharField(max_length=255)
     date = models.DateTimeField()
@@ -86,6 +114,7 @@ class Event(models.Model):
     manager_member = models.OneToOneField(
         'Member', on_delete=models.SET_NULL, null=True, blank=True, related_name='managed_events'
     )
+    target_groups = models.ManyToManyField(TargetGroup, related_name='events')  # Add this line
 
     def clean(self):
         # Ensuring only one manager is set
@@ -94,6 +123,7 @@ class Event(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class EventAttendance(models.Model):
     ATTENDANCE_STATUS_STUDENT = [
@@ -114,6 +144,7 @@ class EventAttendance(models.Model):
     personal_attendance_point = models.IntegerField(default=0)
     attendance_status_student = models.CharField(max_length=15, choices=ATTENDANCE_STATUS_STUDENT, null=True, blank=True)
     attendance_status_member = models.CharField(max_length=15, choices=ATTENDANCE_STATUS_MEMBER, null=True, blank=True)
+    excuse = models.TextField(_("Excuse"), blank=True, null=True)
 
     class Meta:
         unique_together = ('member', 'student', 'event')  # Ensuring uniqueness
@@ -124,6 +155,12 @@ class EventAttendance(models.Model):
             raise ValidationError(_("Attendance must be linked to either a member or a student, not both."))
         if not self.member and not self.student:
             raise ValidationError(_("Attendance must be linked to a member or a student."))
+        
+        # Ensure that excuse is only provided if the status is "excused"
+        if self.attendance_status_student != 'excused' and self.excuse:
+            raise ValidationError(_("Excuse can only be provided if the attendance status is 'excused'."))
+        if self.attendance_status_student == 'excused' and not self.excuse:
+            raise ValidationError(_("An excuse must be provided if the attendance status is 'excused'."))
 
     def __str__(self):
         if self.member:
