@@ -1,2 +1,3 @@
 venv
 cydd_frontend/node_modules
+*/.DS_Store

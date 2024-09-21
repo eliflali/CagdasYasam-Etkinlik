@@ -10,6 +10,22 @@ class Department(models.Model):
     def __str__(self):
         return self.name
 
+# Define the NativeDepartment model
+class NativeDepartment(models.Model):
+    category = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+# Define the HelperDepartment model
+class HelperDepartment(models.Model):
+    category = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+    
 class Project(models.Model):
     name = models.CharField(_("Proje"), max_length=50)
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='projects')
@@ -17,6 +33,8 @@ class Project(models.Model):
     def __str__(self):
         return self.name
 
+
+    
 class Member(models.Model):
     name = models.CharField(_("Ad"), max_length=100)
     tc_number = models.CharField(_("TC Kimlik No"), max_length=11)
@@ -27,6 +45,12 @@ class Member(models.Model):
 
     def __str__(self):
         return self.name
+    
+class Volunteers(Member):
+    status = models.CharField(_("Durum (Burslu/Gönüllü)"), default="VolunteeringMember")
+    
+class Registered(Member):
+    status = models.CharField(_("Durum (Burslu/Gönüllü)"), default="Member")
 
 class Membership(models.Model):
     member = models.ForeignKey(Member, on_delete=models.CASCADE)
@@ -58,20 +82,16 @@ class Student(models.Model):
 class ScholarshipStudent(Student):
     mission = models.CharField(_("Görev"), max_length=100)
     group = models.CharField(_("Öbek"), max_length=100, blank=True)
-    status = models.CharField(_("Durum (Burslu/Gönüllü)"), default="Scholarship")
+    status = models.CharField(_("Durum (Burslu/Gönüllü)"), default="ScholarshipStudent")
 
     def __str__(self):
         return f"{self.name} - {self.status}"
 
 class VolunteeringStudent(Student):
-    status = models.CharField(_("Durum (Burslu/Gönüllü)"), default="Volunteering")
+    status = models.CharField(_("Durum (Burslu/Gönüllü)"), default="VolunteeringStudent")
 
     def __str__(self):
         return f"{self.name} - {self.status}"
-    
-# Event and Attendance Models
-from django.db import models
-from django.utils.translation import gettext_lazy as _
 
 # Define the TargetGroup model
 class TargetGroup(models.Model):
@@ -100,18 +120,14 @@ class TargetGroup(models.Model):
     def __str__(self):
         return self.get_name_display()
 
-# Update the Event model to include the target groups
-# Helper and Native Departments must be added
-# attendant count must be added.
-# for :
-# 1 - from target group
-# 2- from us
-# explanation field must be added - must be optional
 class Event(models.Model):
     name = models.CharField(max_length=255)
     date = models.DateTimeField()
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
+    category = models.CharField(max_length=50)
+    explanation  = models.CharField(max_length=255)
+    event_type = models.CharField(max_lenght=50)
     point = models.IntegerField()
     place = models.CharField(max_length=255, blank=True, null=True)
     manager_student = models.OneToOneField(
@@ -121,7 +137,10 @@ class Event(models.Model):
         'Member', on_delete=models.SET_NULL, null=True, blank=True, related_name='managed_events'
     )
     target_groups = models.ManyToManyField(TargetGroup, related_name='events')  # Add this line
-
+    native_departments = models.ManyToManyField(NativeDepartment, related_name='native_events', blank=True)
+    helper_departments = models.ManyToManyField(HelperDepartment, related_name='helper_events', blank=True)
+    attendant_from_other = models.IntegerField()
+    attendant_from_us = models.IntegerField()
     def clean(self):
         # Ensuring only one manager is set
         if self.manager_student and self.manager_member:
@@ -146,7 +165,7 @@ class EventAttendance(models.Model):
     member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name='attended_events', null=True, blank=True)
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='attended_events', null=True, blank=True)
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='attending_members')
-    points_gained = models.IntegerField(default=0)
+    event_point = models.IntegerField(default=0)
     personal_attendance_point = models.IntegerField(default=0)
     attendance_status_student = models.CharField(max_length=15, choices=ATTENDANCE_STATUS_STUDENT, null=True, blank=True)
     attendance_status_member = models.CharField(max_length=15, choices=ATTENDANCE_STATUS_MEMBER, null=True, blank=True)

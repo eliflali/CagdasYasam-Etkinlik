@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Member, Event, EventAttendance, Student
+from .models import Member, Event, EventAttendance, Student, NativeDepartment, HelperDepartment, TargetGroup
 
 class MemberSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,9 +11,27 @@ class StudentSerializer(serializers.ModelSerializer):
         model = Student
         fields = '__all__'  # Include all fields from the model
 
+class NativeDepartmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NativeDepartment
+        fields = '__all__'  # Include all fields from the model
+
+class HelperDepartmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HelperDepartment
+        fields = '__all__'  # Include all fields from the model
+
+class TargetGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TargetGroup
+        fields = '__all__'  # Include all fields from the model
+
 class EventSerializer(serializers.ModelSerializer):
     manager_student = StudentSerializer(read_only=True)
     manager_member = MemberSerializer(read_only=True)
+    native_departments = NativeDepartmentSerializer(many=True, read_only=True)
+    helper_departments = HelperDepartmentSerializer(many=True, read_only=True)
+    target_groups = TargetGroupSerializer(many=True, read_only=True)
 
     class Meta:
         model = Event
@@ -25,7 +43,10 @@ class EventAttendanceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EventAttendance
-        fields = ['member', 'student', 'event', 'points_gained', 'personal_attendance_point', 'attendance_status_student', 'attendance_status_member']
+        fields = [
+            'member', 'student', 'event', 'event_point', 'personal_attendance_point',
+            'attendance_status_student', 'attendance_status_member', 'excuse'
+        ]
 
     def validate(self, data):
         """
