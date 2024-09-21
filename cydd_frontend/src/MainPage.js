@@ -74,6 +74,10 @@ const MainPage = () => {
           <button  className='button' onClick={() => window.location.href='/query_member'}>Üye Sorgula</button>
           <button  className='button' onClick={() => window.location.href='/add_event'}>Etkinlik Ekle</button>
           <button  className='button' onClick={() => window.location.href='/query_event'}>Etkinlik Sorgula</button>
+          <button  className='button' onClick={() => window.location.href='/add-department'}>Departman Ekle</button>
+          <button  className='button' onClick={() => window.location.href='/add-project'}>Proje Ekle</button>
+          <button  className='button' onClick={() => window.location.href='/add-member-to-department-project'}>Projeye Kişi Ekle</button>
+          <button  className='button' onClick={() => window.location.href='/add-target-group'}>Hedef Kitle Ekle</button>
         </div>
       </div>
       <div>

@@ -10,8 +10,11 @@ class MemberForm(forms.ModelForm):
         model = Member
         fields = ['name', 'tc_number', 'total_volunteering_hours', 'start_time', 'end_time']
 
-class QueryMemberForm(forms.Form):
-    name = forms.CharField(label='Ad', required=False)
-    tc_number = forms.CharField(label='TC Kimlik No', required=False)
-    start_time = forms.DateTimeField(label='Başlangıç Zamanı', required=False)
-    end_time = forms.DateTimeField(label='Bitiş Zamanı', required=False)
+class QueryMemberForm(forms.ModelForm):
+    class Meta:
+        model = Member
+        fields = ['name', 'tc_number', 'total_volunteering_hours', 'start_time', 'end_time']
+        widgets = {
+            'start_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'end_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }

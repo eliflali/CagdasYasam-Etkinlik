@@ -1,10 +1,30 @@
 from rest_framework import serializers
-from .models import Member, Event, EventAttendance, Student, NativeDepartment, HelperDepartment, TargetGroup
+from .models import (
+    Member, 
+    Event, 
+    EventAttendance, 
+    Student, 
+    NativeDepartment, 
+    HelperDepartment, 
+    TargetGroup, 
+    Department, 
+    Project,
+    Volunteers,
+    Registered
+)
 
 class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
-        fields = '__all__'  # Include all fields from the model
+        fields = '__all__'
+        extra_kwargs = {
+            'name': {'required': False},
+            'tc_number': {'required': False},
+            'total_volunteering_hours': {'required': False},
+            'start_time': {'required': False, 'allow_null': True},
+            'end_time': {'required': False, 'allow_null': True},
+        }
+
 
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -19,6 +39,33 @@ class NativeDepartmentSerializer(serializers.ModelSerializer):
 class HelperDepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = HelperDepartment
+        fields = '__all__'  # Include all fields from the model
+        
+class ProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = '__all__'  # Include all fields from the model
+
+class DepartmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Department
+        fields = '__all__'  # Include all fields from the model
+
+
+class VolunteersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Volunteers
+        fields = '__all__'
+
+class RegisteredSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Registered
+        fields = '__all__'
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
         fields = '__all__'  # Include all fields from the model
 
 class TargetGroupSerializer(serializers.ModelSerializer):

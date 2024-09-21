@@ -1,80 +1,103 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import logo from './assets/cydd_logo.jpg'
+import logo from './assets/cydd_logo.jpg';
 
 const AddMemberForm = () => {
     const [formData, setFormData] = useState({
         name: '',
-        mission: '',
-        school: '',
-        department: '',
-        student_class: '',
-        group: '',
-        phone_number: '',
-        email: '',
         tc_number: '',
-        active: true,
-        points_collected: 0,
+        total_volunteering_hours: 0,
+        start_time: '',
+        end_time: '',
+        member_type: 'volunteering', // Default to volunteering member
     });
+
+    const [useTodayDate, setUseTodayDate] = useState(false);
+
+    useEffect(() => {
+        if (useTodayDate) {
+            const now = new Date();
+            const today = now.toISOString().substring(0, 10); // Get the date part (YYYY-MM-DD)
+            const currentTime = now.toTimeString().substring(0, 5); // Get the time part (HH:MM)
+            setFormData(prevState => ({
+                ...prevState,
+                start_time: `${today}T${currentTime}` // Combine date and time
+            }));
+        } else {
+            setFormData(prevState => ({
+                ...prevState,
+                start_time: '', // Clear the start_time if the checkbox is unchecked
+            }));
+        }
+    }, [useTodayDate]);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        console.log(name);
         setFormData(prevState => ({
             ...prevState,
             [name]: type === 'checkbox' ? checked : value
         }));
     };
 
-    // New state for managing notification
     const [notification, setNotification] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Prepare the formData to handle optional end_time
+        const submitData = {
+            ...formData,
+            end_time: formData.end_time || null,  // Set end_time to null if it’s an empty string
+        };
+
         try {
-            const response = await axios.post('http://localhost:8000/members/', formData);
+            const endpoint = submitData.member_type === 'volunteering'
+                ? 'http://localhost:8000/volunteers/'
+                : 'http://localhost:8000/registered/';
+            const response = await axios.post(endpoint, submitData);
             console.log('Member added:', response.data);
 
-            // Set notification
             setNotification("Üye kaydedildi.");
 
-            // Clear form fields
             setFormData({
                 name: '',
-                mission: '',
-                school: '',
-                department: '',
-                student_class: '',
-                group: '',
-                phone_number: '',
-                email: '',
                 tc_number: '',
-                active: true,
-                points_collected: 0,
+                total_volunteering_hours: 0,
+                start_time: '',
+                end_time: '',
+                member_type: 'volunteering',
             });
 
-            // Optionally, clear notification after a few seconds
             setTimeout(() => {
                 setNotification('');
-            }, 3000); // Clear notification after 5 seconds
+            }, 3000);
 
         } catch (error) {
             console.error('There was an error adding the member:', error.response.data);
         }
     };
 
-    // Form fields go here
     return (
         <>
-        
-      <div className="form-container">
-      <div className="header">
-        <img src={logo} alt="Logo" width="100" />
-        <h1>Çağdaş Yaşamı Destekleme Derneği Yenişehir</h1>
-      </div>
-        <form onSubmit={handleSubmit} className="add-member-form">
-            {/* Example field */}
-            <div className="form-group">
+        <div className="form-container">
+            <div className="header">
+                <img src={logo} alt="Logo" width="100" />
+                <h1>Çağdaş Yaşamı Destekleme Derneği Yenişehir</h1>
+            </div>
+            <form onSubmit={handleSubmit} className="add-member-form">
+                <div className="form-group">
+                    <label htmlFor="member_type">Üye Türü</label>
+                    <select
+                        id="member_type"
+                        name="member_type"
+                        value={formData.member_type}
+                        onChange={handleChange}
+                    >
+                        <option value="volunteering">Gönüllü Üye</option>
+                        <option value="registered">Kayıtlı Üye</option>
+                    </select>
+                </div>
+                <div className="form-group">
                     <label htmlFor="name">İsim Soyisim</label>
                     <input
                         id="name"
@@ -85,129 +108,65 @@ const AddMemberForm = () => {
                         placeholder="İsim Soyisim"
                     />
                 </div>
-            <div className="form-group"> 
-            <label htmlFor="mission">Görevi</label>
-                    <input
-                        id="mission"
-                        name="mission"
-                        type="text"
-                        value={formData.mission}
-                        onChange={handleChange}
-                        placeholder="Görevi"
-                    />
-                </div>
                 <div className="form-group"> 
-            <label htmlFor="school">Okul</label>
-                    <input
-                        id="school"
-                        name="school"
-                        type="text"
-                        value={formData.school}
-                        onChange={handleChange}
-                        placeholder="Okul"
-                    />
-                </div>
-                <div className="form-group"> 
-            <label htmlFor="department">Bölümü</label>
-                    <input
-                        id="department"
-                        name="department"
-                        type="text"
-                        value={formData.department}
-                        onChange={handleChange}
-                        placeholder="Bölümü"
-                    />
-                </div>
-            
-                <div className="form-group"> 
-            <label htmlFor="student_class">Sınıfı</label>
-                    <input
-                        id="student_class"
-                        name="student_class"
-                        type="text"
-                        value={formData.student_class}
-                        onChange={handleChange}
-                        placeholder="Sınıfı"
-                    />
-                </div>
-                <div className="form-group"> 
-            <label htmlFor="group">Öbeği</label>
-                    <input
-                        id="group"
-                        name="group"
-                        type="text"
-                        value={formData.group}
-                        onChange={handleChange}
-                        placeholder="Öbeği"
-                    />
-                </div>
-
-                <div className="form-group"> 
-            <label htmlFor="phone_number">Telefon Numarası</label>
-                    <input
-                        id="phone_number"
-                        name="phone_number"
-                        type="text"
-                        value={formData.phone_number}
-                        onChange={handleChange}
-                        placeholder="Telefon Numarası"
-                    />
-                </div>
-
-                <div className="form-group"> 
-            <label htmlFor="email">E-mail</label>
-                    <input
-                        id="email"
-                        name="email"
-                        type="text"
-                        value={formData.email}
-                        onChange={handleChange}
-                        placeholder="E-mail"
-                    />
-                </div>
-
-
-                <div className="form-group"> 
-            <label htmlFor="tc_number">TC Numarası</label>
+                    <label htmlFor="tc_number">TC Numarası</label>
                     <input
                         id="tc_number"
                         name="tc_number"
                         type="text"
                         value={formData.tc_number}
                         onChange={handleChange}
-                        placeholder="TC numarası"
+                        placeholder="TC Numarası"
                     />
                 </div>
-
-            
-            <div className="form-group">
-                    <label>Aktif
-                        <input
-                            name="active"
-                            type="checkbox"
-                            checked={formData.active}
-                            onChange={handleChange}
-                        /> 
-                    </label>
-                </div>
-
                 <div className="form-group"> 
-            <label htmlFor="points_collected">Topladığı Puan</label>
+                    <label htmlFor="total_volunteering_hours">Toplam Gönüllü Saat</label>
                     <input
-                        id="points_collected"
-                        name="points_collected"
-                        type="text"
-                        value={formData.points_collected}
+                        id="total_volunteering_hours"
+                        name="total_volunteering_hours"
+                        type="number"
+                        value={formData.total_volunteering_hours}
                         onChange={handleChange}
-                        placeholder="Topladığı Puan"
+                        placeholder="Toplam Gönüllü Saat"
                     />
                 </div>
-            {/* Include other fields similarly */}
-            <div className="clearfix">
+                <div className="form-group"> 
+                    <label htmlFor="useTodayDate">Bugünkü Tarihi Kullan</label>
+                    <input
+                        id="useTodayDate"
+                        name="useTodayDate"
+                        type="checkbox"
+                        checked={useTodayDate}
+                        onChange={() => setUseTodayDate(!useTodayDate)}
+                    />
+                </div>
+                {!useTodayDate && (
+                    <div className="form-group">
+                        <label htmlFor="start_time">Başlangıç Tarihi</label>
+                        <input
+                            id="start_time"
+                            name="start_time"
+                            type="date"
+                            value={formData.start_time.substring(0, 10)}
+                            onChange={handleChange}
+                        />
+                    </div>
+                )}
+                <div className="form-group"> 
+                    <label htmlFor="end_time">Bitiş Tarihi</label>
+                    <input
+                        id="end_time"
+                        name="end_time"
+                        type="date"
+                        value={formData.end_time.substring(0, 10)}
+                        onChange={handleChange}
+                    />
+                </div>
+                <div className="clearfix">
                     <button type="submit">Ekle</button>
                 </div>
-        </form>
-        {notification && <div className="notification">{notification}</div>}
+            </form>
+            {notification && <div className="notification">{notification}</div>}
         </div>
         </>
     );

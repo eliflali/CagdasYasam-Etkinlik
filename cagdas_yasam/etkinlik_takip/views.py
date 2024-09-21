@@ -15,6 +15,141 @@ from .serializers import MemberSerializer
 from .serializers import EventSerializer
 from .serializers import EventAttendanceSerializer
 from django.shortcuts import get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
+from .forms import LoginForm, QueryMemberForm, MemberForm
+from .models import Member, Event, EventAttendance, NativeDepartment, HelperDepartment, Project, TargetGroup, Department, Membership, Registered, Volunteers
+from .serializers import MemberSerializer, EventSerializer, EventAttendanceSerializer, NativeDepartmentSerializer, HelperDepartmentSerializer, DepartmentSerializer, ProjectSerializer, TargetGroupSerializer
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status, generics
+from itertools import chain
+from rest_framework.exceptions import ValidationError
+
+from .serializers import VolunteersSerializer, RegisteredSerializer
+
+class VolunteersCreate(generics.CreateAPIView):
+    queryset = Volunteers.objects.all()
+    serializer_class = VolunteersSerializer
+
+class RegisteredCreate(generics.CreateAPIView):
+    queryset = Registered.objects.all()
+    serializer_class = RegisteredSerializer
+    
+# Views for Department creation
+class DepartmentCreate(generics.CreateAPIView):
+    queryset = Department.objects.all()
+    serializer_class = DepartmentSerializer
+
+class CombinedDepartmentCreate(APIView):
+    def post(self, request, format=None):
+        # First, create the Department
+        department_data = {
+            "name": request.data.get("name"),
+            "category": request.data.get("category")
+        }
+        department_serializer = DepartmentSerializer(data=department_data)
+        if department_serializer.is_valid():
+            department = department_serializer.save()
+
+            # Then, create the NativeDepartment
+            if request.data.get("department_type") == "native":
+                native_department_data = {
+                    "name": request.data.get("name"),
+                    "category": request.data.get("category")
+                }
+                native_department_serializer = NativeDepartmentSerializer(data=native_department_data)
+                if native_department_serializer.is_valid():
+                    native_department = native_department_serializer.save()
+                    return Response({
+                        "department": department_serializer.data,
+                        "native_department": native_department_serializer.data
+                    }, status=status.HTTP_201_CREATED)
+                else:
+                    return Response(native_department_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({"department": department_serializer.data}, status=status.HTTP_201_CREATED)
+        else:
+            return Response(department_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class NativeDepartmentCreate(generics.CreateAPIView):
+    queryset = NativeDepartment.objects.all()
+    serializer_class = NativeDepartmentSerializer
+
+class HelperDepartmentCreate(generics.CreateAPIView):
+    queryset = HelperDepartment.objects.all()
+    serializer_class = HelperDepartmentSerializer
+
+# Department List View to handle both Native and Helper Departments
+class DepartmentListView(generics.ListAPIView):
+    queryset = Department.objects.all()
+    serializer_class = DepartmentSerializer
+
+# Views for Project creation
+class ProjectCreate(generics.CreateAPIView):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+
+    def perform_create(self, serializer):
+        # The department object is directly passed from the frontend
+        department = serializer.validated_data.get('department')
+
+        if not isinstance(department, Department):
+            raise ValidationError("Invalid department object. Please ensure the department is correct.")
+
+        # Save the project with the given department
+        serializer.save(department=department)
+
+class ProjectListView(generics.ListAPIView):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+
+# View for Membership (adding members to departments and projects)
+
+class MembershipCreate(APIView):
+    def post(self, request, format=None):
+        data = request.data
+        member_id = data.get('member')
+        department_id = data.get('department')
+        project_ids = data.get('projects', [])
+
+        # Fetch the member and department
+        member = get_object_or_404(Member, id=member_id)
+        department = get_object_or_404(Department, id=department_id)  # Ensure this fetches from the Department model
+
+        # Create the membership
+        membership, created = Membership.objects.get_or_create(member=member, department=department)
+
+        # Add projects to the membership
+        for project_id in project_ids:
+            project = get_object_or_404(Project, id=project_id)
+            membership.projects.add(project)
+
+        membership.save()
+        return Response({"message": "Member added to department and projects successfully."}, status=status.HTTP_201_CREATED)
+
+class DepartmentProjectsListView(APIView):
+    def get(self, request, department_id, format=None):
+        department = get_object_or_404(Department, id=department_id)
+        projects = department.projects.all()  # Assuming the relationship is set in the model
+        serializer = ProjectSerializer(projects, many=True)
+        return Response(serializer.data)
+
+class MemberListAllView(generics.ListAPIView):
+    queryset = Member.objects.all()
+    serializer_class = MemberSerializer
+
+
+# Views for Target Group creation
+
+class TargetGroupCreate(generics.CreateAPIView):
+    queryset = TargetGroup.objects.all()
+    serializer_class = TargetGroupSerializer
+
+class TargetGroupListView(generics.ListAPIView):
+    queryset = TargetGroup.objects.all()
+    serializer_class = TargetGroupSerializer
+
 
 
 class RemoveAttendeeView(APIView):
@@ -59,6 +194,22 @@ class AddMemberToEventView(APIView):
         # If the serializer is not valid, return an error response
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+
+
+# Department List View to handle only Native Departments for project creation
+class NativeDepartmentListView(generics.ListAPIView):
+    queryset = NativeDepartment.objects.all()
+    serializer_class = NativeDepartmentSerializer
+    
+class NativeDepartmentCreate(generics.CreateAPIView):
+    queryset = NativeDepartment.objects.all()
+    serializer_class = NativeDepartmentSerializer
+
+class HelperDepartmentCreate(generics.CreateAPIView):
+    queryset = HelperDepartment.objects.all()
+    serializer_class = HelperDepartmentSerializer
+
+
 class MemberUpdateDeleteAPIView(APIView):
     def get_object(self, pk):
         try:
@@ -85,18 +236,24 @@ class MemberUpdateDeleteAPIView(APIView):
     
 class MemberListView(APIView):
     def get(self, request, *args, **kwargs):
-        # Retrieve query parameters
         query_params = request.query_params
-        
-        # Filter queryset based on query parameters
         queryset = Member.objects.all()
-        for key, value in query_params.items():
-            if value:
-                # Update the queryset to filter based on the provided parameter
-                queryset = queryset.filter(**{key: value})
+
+        # Apply filters if corresponding query parameters are provided
+        if 'name' in query_params:
+            queryset = queryset.filter(name__icontains=query_params['name'])
+        if 'tc_number' in query_params:
+            queryset = queryset.filter(tc_number__icontains=query_params['tc_number'])
+        if 'total_volunteering_hours' in query_params:
+            queryset = queryset.filter(total_volunteering_hours=query_params['total_volunteering_hours'])
+        if 'start_time' in query_params:
+            queryset = queryset.filter(start_time__gte=query_params['start_time'])
+        if 'end_time' in query_params:
+            queryset = queryset.filter(end_time__lte=query_params['end_time'])
 
         serializer = MemberSerializer(queryset, many=True)
         return Response(serializer.data)
+
 
 
 
