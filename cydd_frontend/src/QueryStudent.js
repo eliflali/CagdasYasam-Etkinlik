@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
-import logo from './assets/cydd_logo.jpg';
 import './QueryMember.css';
 import { FaTrash, FaEdit, FaSave } from 'react-icons/fa';
 
-const QueryMember = () => {
+const QueryStudent= () => {
   const [searchParams, setSearchParams] = useState({ name: '', tc_number: '' });
-  const [members, setMembers] = useState([]);
-  const [editableMemberId, setEditableMemberId] = useState(null);
+  const [students, setStudents] = useState([]);
+  const [editableStudentId, setEditableStudentId] = useState(null);
   const [editFormData, setEditFormData] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -30,12 +29,12 @@ const QueryMember = () => {
   };
 
   // Search members with the current search params
-  const fetchMembers = async () => {
+  const fetchStudents = async () => {
     setLoading(true);
     try {
       const queryString = new URLSearchParams(searchParams).toString();
-      const response = await axios.get(`http://localhost:8000/members_list/?${queryString}`);
-      setMembers(response.data);
+      const response = await axios.get(`http://localhost:8000/student_list/?${queryString}`);
+      setStudents(response.data);
     } catch (error) {
       console.error("Failed to fetch members", error);
     } finally {
@@ -44,7 +43,7 @@ const QueryMember = () => {
   };
 
   // Debounce search function
-  const debouncedSearch = debounce(fetchMembers, 500);
+  const debouncedSearch = debounce(fetchStudents, 500);
 
   const handleEditChange = (e) => {
     setEditFormData({
@@ -53,30 +52,30 @@ const QueryMember = () => {
     });
   };
 
-  const handleDelete = async (memberId) => {
+  const handleDelete = async (studentId) => {
     try {
-      await axios.delete(`http://localhost:8000/members/${memberId}/`);
-      setMembers(members.filter(member => member.id !== memberId));
+      await axios.delete(`http://localhost:8000/students/${studentId}/`);
+      setStudents(students.filter(student => student.id !== studentId));
     } catch (error) {
       console.error("Failed to delete member", error);
     }
   };
 
-  const handleEdit = (member) => {
-    setEditableMemberId(member.id);
-    setEditFormData(member);
+  const handleEdit = (student) => {
+    setEditableStudentId(student.id);
+    setEditFormData(student);
   };
 
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.put(`http://localhost:8000/members/${editableMemberId}/`, editFormData);
-      const updatedMembers = members.map(member => {
-        if (member.id === editableMemberId) return response.data;
-        return member;
+      const response = await axios.put(`http://localhost:8000/students/${editableStudentId}/`, editFormData);
+      const updatedStudents = students.map(student => {
+        if (student.id === editableStudentId) return response.data;
+        return student;
       });
-      setMembers(updatedMembers);
-      setEditableMemberId(null);
+      setStudents(updatedStudents);
+      setEditableStudentId(null);
     } catch (error) {
       console.error("Failed to update member", error);
     }
@@ -111,10 +110,10 @@ const QueryMember = () => {
               </tr>
             </thead>
             <tbody>
-              {members.length > 0 ? (
-                members.map((member) => (
-                  <tr key={member.id}>
-                    {editableMemberId === member.id ? (
+              {students.length > 0 ? (
+                students.map((student) => (
+                  <tr key={student.id}>
+                    {editableStudentId === student.id ? (
                       <>
                         <td><input type="text" name="name" value={editFormData.name} onChange={handleEditChange} /></td>
                         <td><input type="text" name="tc_number" value={editFormData.tc_number} onChange={handleEditChange} /></td>
@@ -124,20 +123,20 @@ const QueryMember = () => {
                       </>
                     ) : (
                       <>
-                        <td>{member.name}</td>
-                        <td>{member.tc_number}</td>
-                        <td>{member.total_volunteering_hours}</td>
-                        <td>{member.start_time}</td>
-                        <td>{member.end_time}</td>
+                        <td>{student.name}</td>
+                        <td>{student.tc_number}</td>
+                        <td>{student.total_volunteering_hours}</td>
+                        <td>{student.start_time}</td>
+                        <td>{student.end_time}</td>
                       </>
                     )}
                     <td>
-                      {editableMemberId === member.id ? (
+                      {editableStudentId === student.id ? (
                         <FaSave onClick={handleUpdate} />
                       ) : (
                         <>
-                          <FaEdit onClick={() => handleEdit(member)} />
-                          <FaTrash onClick={() => handleDelete(member.id)} />
+                          <FaEdit onClick={() => handleEdit(student)} />
+                          <FaTrash onClick={() => handleDelete(student.id)} />
                         </>
                       )}
                     </td>
@@ -156,4 +155,4 @@ const QueryMember = () => {
   );
 };
 
-export default QueryMember;
+export default QueryStudent;

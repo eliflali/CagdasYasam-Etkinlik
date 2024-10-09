@@ -76,10 +76,6 @@ const QueryEvent = () => {
 
   return (
         <div className='page_container'>
-          <div className="header">
-            <img src={logo} alt="Logo" width="100" />
-            <h1>Çağdaş Yaşamı Destekleme Derneği Yenişehir</h1>
-          </div>
           <div className="formContainer">
             <form onSubmit={handleSubmit} className="form">
                 <p>

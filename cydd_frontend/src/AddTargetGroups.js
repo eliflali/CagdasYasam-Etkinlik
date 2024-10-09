@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import logo from './assets/cydd_logo.jpg';
 
 const AddTargetGroupForm = () => {
     const [formData, setFormData] = useState({
@@ -25,10 +24,12 @@ const AddTargetGroupForm = () => {
 
             setNotification("Hedef grup kaydedildi.");
 
+            // Clear the form after successful submission
             setFormData({
                 name: '',
             });
 
+            // Clear the notification after a few seconds
             setTimeout(() => {
                 setNotification('');
             }, 3000);
@@ -41,38 +42,17 @@ const AddTargetGroupForm = () => {
     return (
         <>
         <div className="form-container">
-            <div className="header">
-                <img src={logo} alt="Logo" width="100" />
-                <h1>Çağdaş Yaşamı Destekleme Derneği Yenişehir</h1>
-            </div>
             <form onSubmit={handleSubmit} className="add-target-group-form">
                 <div className="form-group">
                     <label htmlFor="name">Hedef Grup Adı</label>
-                    <select
+                    <input
                         id="name"
                         name="name"
+                        type="text"
                         value={formData.name}
                         onChange={handleChange}
-                    >
-                        <option value="">Bir Hedef Grup Seçin</option>
-                        <option value="BURS_VERENLER">Burs Verenler</option>
-                        <option value="BURSLU_OGRENCILER">Burslu Öğrenciler</option>
-                        <option value="COCUKLAR">Çocuklar</option>
-                        <option value="GENCLER">Gençler</option>
-                        <option value="GONULLULER">Gönüllüler</option>
-                        <option value="KADINLAR">Kadınlar</option>
-                        <option value="MEDYA_KAMUOYU">Medya - Kamuoyu</option>
-                        <option value="OGRENCILER">Öğrenciler</option>
-                        <option value="KURUMSAL_SIRKETLER_STO">Kurumsal Şirketler - STÖ'ler</option>
-                        <option value="RESMI_KURUMLAR_YEREL_YONETIMLER">Resmi Kurumlar - Yerel Yönetimler</option>
-                        <option value="OGRENCILER_YETISKINLER">Öğrenciler-Yetişkinler</option>
-                        <option value="UYELER">Üyeler</option>
-                        <option value="VELILER">Veliler</option>
-                        <option value="UYELER_VE_GONULLULER">Üyeler ve Gönüllüler</option>
-                        <option value="HALK">Halk</option>
-                        <option value="YONETIM_KURULU">Yönetim Kurulu</option>
-                        <option value="ESNAF">Esnaf</option>
-                    </select>
+                        placeholder="Hedef Grup Adı"
+                    />
                 </div>
                 <div className="clearfix">
                     <button type="submit">Ekle</button>

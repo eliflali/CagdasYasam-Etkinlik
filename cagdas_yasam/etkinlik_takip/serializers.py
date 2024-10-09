@@ -10,7 +10,9 @@ from .models import (
     Department, 
     Project,
     Volunteers,
-    Registered
+    Registered,
+    VolunteeringStudent,
+    ScholarshipStudent
 )
 
 class MemberSerializer(serializers.ModelSerializer):
@@ -62,6 +64,15 @@ class RegisteredSerializer(serializers.ModelSerializer):
         model = Registered
         fields = '__all__'
 
+class VolunteeringStudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VolunteeringStudent
+        fields = '__all__'
+        
+class ScholarshipStudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ScholarshipStudent
+        fields = '__all__'
 
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:

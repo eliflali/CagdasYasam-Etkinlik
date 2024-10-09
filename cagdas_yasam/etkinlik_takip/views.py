@@ -18,8 +18,8 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from .forms import LoginForm, QueryMemberForm, MemberForm
-from .models import Member, Event, EventAttendance, NativeDepartment, HelperDepartment, Project, TargetGroup, Department, Membership, Registered, Volunteers
-from .serializers import MemberSerializer, EventSerializer, EventAttendanceSerializer, NativeDepartmentSerializer, HelperDepartmentSerializer, DepartmentSerializer, ProjectSerializer, TargetGroupSerializer
+from .models import Member, Event, EventAttendance, NativeDepartment, HelperDepartment, Project, TargetGroup, Department, Membership, Registered, Volunteers, Student, VolunteeringStudent, ScholarshipStudent, StudentMembership
+from .serializers import MemberSerializer, EventSerializer, EventAttendanceSerializer, NativeDepartmentSerializer, HelperDepartmentSerializer, DepartmentSerializer, ProjectSerializer, TargetGroupSerializer, StudentSerializer, VolunteeringStudentSerializer, ScholarshipStudentSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics
@@ -31,11 +31,18 @@ from .serializers import VolunteersSerializer, RegisteredSerializer
 class VolunteersCreate(generics.CreateAPIView):
     queryset = Volunteers.objects.all()
     serializer_class = VolunteersSerializer
+    
+class VolunteerStudentCreate(generics.CreateAPIView):
+    queryset = VolunteeringStudent.objects.all()
+    serializer_class = VolunteeringStudentSerializer
 
 class RegisteredCreate(generics.CreateAPIView):
     queryset = Registered.objects.all()
     serializer_class = RegisteredSerializer
     
+class ScholarshipStudentCreate(generics.CreateAPIView):
+    queryset = ScholarshipStudent.objects.all()
+    serializer_class = ScholarshipStudentSerializer
 # Views for Department creation
 class DepartmentCreate(generics.CreateAPIView):
     queryset = Department.objects.all()
@@ -127,6 +134,28 @@ class MembershipCreate(APIView):
 
         membership.save()
         return Response({"message": "Member added to department and projects successfully."}, status=status.HTTP_201_CREATED)
+    
+class StudentMembershipCreate(APIView):
+    def post(self, request, format=None):
+        data = request.data
+        student_id = data.get('student')
+        department_id = data.get('department')
+        project_ids = data.get('projects', [])
+
+        # Fetch the member and department
+        student = get_object_or_404(Student, id=student_id)
+        department = get_object_or_404(Department, id=department_id)  # Ensure this fetches from the Department model
+
+        # Create the membership
+        membership, created = StudentMembership.objects.get_or_create(student=student, department=department)
+
+        # Add projects to the membership
+        for project_id in project_ids:
+            project = get_object_or_404(Project, id=project_id)
+            membership.projects.add(project)
+
+        membership.save()
+        return Response({"message": "Member added to department and projects successfully."}, status=status.HTTP_201_CREATED)
 
 class DepartmentProjectsListView(APIView):
     def get(self, request, department_id, format=None):
@@ -138,6 +167,10 @@ class DepartmentProjectsListView(APIView):
 class MemberListAllView(generics.ListAPIView):
     queryset = Member.objects.all()
     serializer_class = MemberSerializer
+    
+class StudentListAllView(generics.ListAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
 
 
 # Views for Target Group creation
@@ -194,6 +227,27 @@ class AddMemberToEventView(APIView):
         # If the serializer is not valid, return an error response
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+class AddStudentToEventView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = EventAttendanceSerializer(data=request.data)
+        print(request.data)
+        if serializer.is_valid():
+            # Save the EventAttendance instance
+            event_attendance = serializer.save()
+            
+            # Fetch the Member instance related to the EventAttendance
+            student = event_attendance.student
+            
+            # Update the member's points_collected
+            student.points_collected += event_attendance.points_gained
+            student.save()
+            
+            # Return the updated EventAttendance data
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        # If the serializer is not valid, return an error response
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
 
 # Department List View to handle only Native Departments for project creation
@@ -234,6 +288,30 @@ class MemberUpdateDeleteAPIView(APIView):
         member.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
+class StudentUpdateDeleteAPIView(APIView):
+    def get_object(self, pk):
+        try:
+            return Student.objects.get(pk=pk)
+        except Student.DoesNotExist:
+            return None
+
+    def put(self, request, pk, format=None):
+        student = self.get_object(pk)
+        if student is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = StudentSerializer(student, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        student = self.get_object(pk)
+        if student is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        student.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
 class MemberListView(APIView):
     def get(self, request, *args, **kwargs):
         query_params = request.query_params
@@ -255,11 +333,40 @@ class MemberListView(APIView):
         return Response(serializer.data)
 
 
+    
+class StudentListView(APIView):
+    def get(self, request, *args, **kwargs):
+        query_params = request.query_params
+        queryset = Student.objects.all()
+
+        # Apply filters if corresponding query parameters are provided
+        if 'name' in query_params:
+            queryset = queryset.filter(name__icontains=query_params['name'])
+        if 'tc_number' in query_params:
+            queryset = queryset.filter(tc_number__icontains=query_params['tc_number'])
+        if 'total_volunteering_hours' in query_params:
+            queryset = queryset.filter(total_volunteering_hours=query_params['total_volunteering_hours'])
+        if 'start_time' in query_params:
+            queryset = queryset.filter(start_time__gte=query_params['start_time'])
+        if 'end_time' in query_params:
+            queryset = queryset.filter(end_time__lte=query_params['end_time'])
+
+        serializer = StudentSerializer(queryset, many=True)
+        return Response(serializer.data)
+
 
 
 class MemberCreate(APIView):
     def post(self, request, format=None):
         serializer = MemberSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class StudentCreate(APIView):
+    def post(self, request, format=None):
+        serializer = StudentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -317,6 +424,12 @@ class MemberDetailView(APIView):
     def get(self, request, pk):
         member = get_object_or_404(Member, pk=pk)
         serializer = MemberSerializer(member)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class StudentDetailView(APIView):
+    def get(self, request, pk):
+        member = get_object_or_404(Student, pk=pk)
+        serializer = StudentSerializer(member)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 def login_view(request):

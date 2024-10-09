@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
-import BaseLayout from './BaseLayout';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import './MainPage.css'; // Your CSS file for MainPage styles
-import { FaTrash, FaEdit, FaSave, FaRegEye } from 'react-icons/fa'; // Import icons
+import './MainPage.css';
+import { FaTrash, FaEdit, FaSave, FaRegEye } from 'react-icons/fa';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const MainPage = () => {
   const [events, setEvents] = useState([]);
@@ -64,70 +63,55 @@ const MainPage = () => {
     navigate(`/events/${event.id}`, { state: { event } });
   };
 
-
   return (
-    
-    <BaseLayout>
-      <div className="header">
-        <div>
-          <button className='button' onClick={() => window.location.href='/add_member'}>Üye Ekle</button>
-          <button  className='button' onClick={() => window.location.href='/query_member'}>Üye Sorgula</button>
-          <button  className='button' onClick={() => window.location.href='/add_event'}>Etkinlik Ekle</button>
-          <button  className='button' onClick={() => window.location.href='/query_event'}>Etkinlik Sorgula</button>
-          <button  className='button' onClick={() => window.location.href='/add-department'}>Departman Ekle</button>
-          <button  className='button' onClick={() => window.location.href='/add-project'}>Proje Ekle</button>
-          <button  className='button' onClick={() => window.location.href='/add-member-to-department-project'}>Projeye Kişi Ekle</button>
-          <button  className='button' onClick={() => window.location.href='/add-target-group'}>Hedef Kitle Ekle</button>
-        </div>
-      </div>
+    <>
       <div>
-      <table className="eventsTable">
-        <thead>
-          <tr>
-            <th>Etkinlik İsmi</th>
-            <th>Tarihi</th>
-            <th>Puanı</th>
-            <th>Mekan</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {events.map((event) => (
-            <tr key={event.id}>
-              {/* Editable fields */}
-              {editableEventId === event.id ? (
-                <>
-                  <td><input type="text" name="name" value={editFormData.name} onChange={handleEditChange} /></td>
-                  <td><input type="date" name="date" value={editFormData.date} onChange={handleEditChange} /></td>
-                  <td><input type="number" name="point" value={editFormData.point} onChange={handleEditChange} /></td>
-                  <td><input type="text" name="place" value={editFormData.place} onChange={handleEditChange} /></td>
-                </>
-              ) : (
-                <>
-                  <td>{event.name}</td>
-                  <td>{event.date}</td>
-                  <td>{event.point}</td>
-                  <td>{event.place}</td>
-                  {/* Display other member details */}
-                </>
-              )}
-              <td>
+        <table className="eventsTable">
+          <thead>
+            <tr>
+              <th>Etkinlik İsmi</th>
+              <th>Tarihi</th>
+              <th>Puanı</th>
+              <th>Mekan</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {events.map((event) => (
+              <tr key={event.id}>
+                {/* Editable fields */}
                 {editableEventId === event.id ? (
-                  <FaSave onClick={handleUpdate} />
+                  <>
+                    <td><input type="text" name="name" value={editFormData.name} onChange={handleEditChange} /></td>
+                    <td><input type="date" name="date" value={editFormData.date} onChange={handleEditChange} /></td>
+                    <td><input type="number" name="point" value={editFormData.point} onChange={handleEditChange} /></td>
+                    <td><input type="text" name="place" value={editFormData.place} onChange={handleEditChange} /></td>
+                  </>
                 ) : (
                   <>
-                    <FaEdit onClick={() => handleEdit(event)} />
-                    <FaTrash onClick={() => handleDelete(event.id)} />
-                    <FaRegEye onClick={() => handleNavigateToEvent(event)} /> {/* View icon */}
+                    <td>{event.name}</td>
+                    <td>{event.date}</td>
+                    <td>{event.point}</td>
+                    <td>{event.place}</td>
                   </>
                 )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                <td>
+                  {editableEventId === event.id ? (
+                    <FaSave onClick={handleUpdate} />
+                  ) : (
+                    <>
+                      <FaEdit onClick={() => handleEdit(event)} />
+                      <FaTrash onClick={() => handleDelete(event.id)} />
+                      <FaRegEye onClick={() => handleNavigateToEvent(event)} /> {/* View icon */}
+                    </>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
-    </BaseLayout>
+    </>
   );
 };
 

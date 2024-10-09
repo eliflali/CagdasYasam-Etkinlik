@@ -80,10 +80,6 @@ const AddMemberForm = () => {
     return (
         <>
         <div className="form-container">
-            <div className="header">
-                <img src={logo} alt="Logo" width="100" />
-                <h1>Çağdaş Yaşamı Destekleme Derneği Yenişehir</h1>
-            </div>
             <form onSubmit={handleSubmit} className="add-member-form">
                 <div className="form-group">
                     <label htmlFor="member_type">Üye Türü</label>

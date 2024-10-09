@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import logo from './assets/cydd_logo.jpg';
 
 const AddStudentForm = () => {
     const [formData, setFormData] = useState({
@@ -13,7 +12,7 @@ const AddStudentForm = () => {
         phone_number: '',
         active: true,
         points_collected: 0,
-        student_type: 'volunteering', // Default to volunteering student
+        student_type: '', // Default to volunteering student
         mission: '',
         group: '',
     });
@@ -32,8 +31,8 @@ const AddStudentForm = () => {
         e.preventDefault();
         try {
             const endpoint = formData.student_type === 'volunteering'
-                ? 'http://localhost:8000/volunteering-students/'
-                : 'http://localhost:8000/scholarship-students/';
+                ? 'http://localhost:8000/volunteer_students/'
+                : 'http://localhost:8000/scholarship_students/';
             const response = await axios.post(endpoint, formData);
             console.log('Student added:', response.data);
 
@@ -66,10 +65,6 @@ const AddStudentForm = () => {
     return (
         <>
         <div className="form-container">
-            <div className="header">
-                <img src={logo} alt="Logo" width="100" />
-                <h1>Çağdaş Yaşamı Destekleme Derneği Yenişehir</h1>
-            </div>
             <form onSubmit={handleSubmit} className="add-student-form">
                 <div className="form-group">
                     <label htmlFor="student_type">Öğrenci Türü</label>

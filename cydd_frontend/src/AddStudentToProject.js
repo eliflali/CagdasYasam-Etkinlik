@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import logo from './assets/cydd_logo.jpg';
 
-const AddMemberToDepartmentProjectForm = () => {
+const AddStudentToDepartmentProjectForm = () => {
     const [formData, setFormData] = useState({
-        member: '',
+        student: '',
         department: '',
         projects: [],
     });
 
-    const [members, setMembers] = useState([]);
+    const [students, setStudents] = useState([]);
     const [departments, setDepartments] = useState([]);
     const [projects, setProjects] = useState([]);
     const [notification, setNotification] = useState('');
@@ -17,10 +16,10 @@ const AddMemberToDepartmentProjectForm = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const membersResponse =  await axios.get('http://localhost:8000/members_list/');
+                const studentsResponse =  await axios.get('http://localhost:8000/student_list/');
                 ;
                 const departmentsResponse = await axios.get('http://localhost:8000/departments');
-                setMembers(membersResponse.data);
+                setStudents(studentsResponse.data);
                 setDepartments(departmentsResponse.data);
             } catch (error) {
                 console.error('There was an error fetching data:', error.response.data);
@@ -65,10 +64,10 @@ const AddMemberToDepartmentProjectForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:8000/memberships/', formData);
+            const response = await axios.post('http://localhost:8000/student_memberships/', formData);
             console.log('Member added to department and projects:', response.data);
 
-            setNotification("Üye departman ve projelere eklendi.");
+            setNotification("Öğrenci departman ve projelere eklendi.");
 
             setFormData({
                 member: '',
@@ -90,17 +89,17 @@ const AddMemberToDepartmentProjectForm = () => {
         <div className="form-container">
             <form onSubmit={handleSubmit} className="add-member-to-department-project-form">
                 <div className="form-group">
-                    <label htmlFor="member">Üye</label>
+                    <label htmlFor="student">Student</label>
                     <select
-                        id="member"
-                        name="member"
-                        value={formData.member}
+                        id="student"
+                        name="student"
+                        value={formData.student}
                         onChange={handleChange}
                     >
-                        <option value="">Bir Üye Seçin</option>
-                        {members.map(member => (
-                            <option key={member.id} value={member.id}>
-                                {member.name}
+                        <option value="">Bir Öğrenci Seçin</option>
+                        {students.map(student => (
+                            <option key={student.id} value={student.id}>
+                                {student.name}
                             </option>
                         ))}
                     </select>
@@ -147,4 +146,4 @@ const AddMemberToDepartmentProjectForm = () => {
     );
 };
 
-export default AddMemberToDepartmentProjectForm;
+export default AddStudentToDepartmentProjectForm;

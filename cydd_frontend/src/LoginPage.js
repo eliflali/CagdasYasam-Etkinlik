@@ -1,7 +1,6 @@
 // LoginPage.js
 import React, { useState } from 'react';
 import './LoginPage.css'; // Make sure to create a LoginPage.css file with the CSS below
-import logo from './assets/cydd_logo.jpg'
 import { useNavigate } from 'react-router-dom';
 
 function LoginPage() {
@@ -17,10 +16,7 @@ function LoginPage() {
 
   return (
     <div className="container">
-      <div className="header">
-        <img src={logo} alt="Logo" width="100" />
-        <h1>Çağdaş Yaşamı Destekleme Derneği Yenişehir</h1>
-      </div>
+      
       <form onSubmit={handleSubmit}>
         <input
           type="text"

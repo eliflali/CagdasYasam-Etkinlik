@@ -24,7 +24,14 @@ from .views import (
     NativeDepartmentListView,
     DepartmentProjectsListView,
     DepartmentCreate,
-    CombinedDepartmentCreate
+    CombinedDepartmentCreate,
+    StudentCreate,
+    VolunteerStudentCreate,
+    ScholarshipStudentCreate,
+    StudentListView,
+    StudentUpdateDeleteAPIView,
+    StudentDetailView,
+    StudentMembershipCreate
 )
 
 urlpatterns = [
@@ -40,6 +47,14 @@ urlpatterns = [
     path('members_list/', MemberListView.as_view(), name='members-list'),
     path('members/<int:pk>/', MemberUpdateDeleteAPIView.as_view(), name='member-update-delete'),
     path('memberslist/<int:pk>/', MemberDetailView.as_view(), name='member-detail'),
+    
+    # Student URLs
+    path('volunteer_students/', VolunteerStudentCreate.as_view(), name='volunteer-students-create'),
+    path('scholarship_students/', ScholarshipStudentCreate.as_view(), name='scholarship-students-create'),
+    path('students/', StudentCreate.as_view(), name='student-create'),
+    path('student_list/', StudentListView.as_view(), name='students-list'),
+    path('students/<int:pk>/', StudentUpdateDeleteAPIView.as_view(), name='students-update-delete'),
+    path('studentslist/<int:pk>/', StudentDetailView.as_view(), name='student-detail'),
     
     # Event URLs
     path('events/', EventCreate.as_view(), name='event-create'),
@@ -64,7 +79,7 @@ urlpatterns = [
     
     # Membership (adding members to departments and projects) URLs
     path('memberships/', MembershipCreate.as_view(), name='membership-create'),
-    
+    path('student_memberships/', StudentMembershipCreate.as_view(), name='student-membership-create'),
     # Target Group URLs
     path('target-groups/', TargetGroupCreate.as_view(), name='target-group-create'),
     path('target-groups_list/', TargetGroupListView.as_view(), name='target-groups-list'),

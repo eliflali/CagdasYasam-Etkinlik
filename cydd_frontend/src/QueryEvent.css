@@ -3,22 +3,7 @@
     font-family: Arial, sans-serif;
   }
   
-  .header {
-    display: flex;
-    align-items: center;
-    background-color: #005A9C; /* Adjust the color to match your branding */
-    color: white;
-    padding: 10px 20px;
-  }
-  
-  .header img {
-    margin-right: 20px;
-  }
-  
-  .header h1 {
-    font-size: 24px;
-    margin: 0;
-  }
+ 
   
   .formContainer {
     display: flex;

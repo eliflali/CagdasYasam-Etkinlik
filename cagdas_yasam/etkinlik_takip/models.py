@@ -105,30 +105,10 @@ class StudentMembership(models.Model):
     
 # Define the TargetGroup model
 class TargetGroup(models.Model):
-    TARGET_GROUP_CHOICES = [
-        ('BURS_VERENLER', 'Burs Verenler'),
-        ('BURSLU_OGRENCILER', 'Burslu Öğrenciler'),
-        ('COCUKLAR', 'Çocuklar'),
-        ('GENCLER', 'Gençler'),
-        ('GONULLULER', 'Gönüllüler'),
-        ('KADINLAR', 'Kadınlar'),
-        ('MEDYA_KAMUOYU', 'Medya - Kamuoyu'),
-        ('OGRENCILER', 'Öğrenciler'),
-        ('KURUMSAL_SIRKETLER_STO', 'Kurumsal Şirketler - STÖ\'ler'),
-        ('RESMI_KURUMLAR_YEREL_YONETIMLER', 'Resmi Kurumlar - Yerel Yönetimler'),
-        ('OGRENCILER_YETISKINLER', 'Öğrenciler-Yetişkinler'),
-        ('UYELER', 'Üyeler'),
-        ('VELILER', 'Veliler'),
-        ('UYELER_VE_GONULLULER', 'Üyeler ve Gönüllüler'),
-        ('HALK', 'Halk'),
-        ('YONETIM_KURULU', 'Yönetim Kurulu'),
-        ('ESNAF', 'Esnaf'),
-    ]
-
-    name = models.CharField(max_length=255, choices=TARGET_GROUP_CHOICES, unique=True)
+    name = models.CharField(max_length=255, null=True)
 
     def __str__(self):
-        return self.get_name_display()
+        return self.name
 
 class Event(models.Model):
     name = models.CharField(max_length=255)
