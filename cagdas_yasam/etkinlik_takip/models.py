@@ -75,6 +75,7 @@ class Student(models.Model):
     total_volunteering_hours = models.IntegerField(_("Toplam Gönüllü Saat"), default=0, blank = True)
     start_time = models.DateTimeField(null = True)
     end_time = models.DateTimeField(null = True)
+    status = models.CharField(_("Durum (Burslu/Gönüllü)"), default="undefined", max_length=100)
 
     def __str__(self):
         return self.name
@@ -82,14 +83,11 @@ class Student(models.Model):
 class ScholarshipStudent(Student):
     mission = models.CharField(_("Görev"), max_length=100)
     group = models.CharField(_("Öbek"), max_length=100, blank=True)
-    status = models.CharField(_("Durum (Burslu/Gönüllü)"), default="ScholarshipStudent", max_length=100)
-
+    
     def __str__(self):
         return f"{self.name} - {self.status}"
 
 class VolunteeringStudent(Student):
-    status = models.CharField(_("Durum (Burslu/Gönüllü)"), default="VolunteeringStudent", max_length=100)
-
     def __str__(self):
         return f"{self.name} - {self.status}"
 

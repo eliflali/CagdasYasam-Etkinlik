@@ -1,4 +1,9 @@
 
+
+.main-content {
+    position: relative;
+    margin-top: 0px;
+}
   h2 {
     color: #333;
     margin-bottom: 0.5rem;

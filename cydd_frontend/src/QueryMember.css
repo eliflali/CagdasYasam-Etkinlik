@@ -1,136 +1,210 @@
+/* Header positioning */
+.header-container {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.page-container {
+  padding: 20px;
+  background-color: #f5f7fa;
+  min-height: calc(100vh - 80px);
+}
+
 .formContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 20px;
 }
 
+/* Search form styling */
 .form {
-  background-color: #0555ab; /* Light grey background */
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  max-width: 600px; /* Limit the form width */
+  background-color: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   width: 100%;
+  max-width: 1000px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-end;
+  margin-bottom: 20px;
 }
 
-.form p, .form label {
-  margin: 10px 0;
+.form p {
+  flex: 1;
+  min-width: 250px;
+  margin: 0;
 }
 
-.form input[type="text"],
-.form input[type="email"],
-.form input[type="checkbox"] {
-  padding: 8px;
-  margin-top: 5px;
-  margin-bottom: 15px;
-  width: calc(100% - 16px); /* Full width minus padding */
-  box-sizing: border-box; /* Include padding and border in element's width */
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.form label {
+  display: block;
+  font-size: 0.9rem;
+  color: #4a5568;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.form input[type="text"] {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  background-color: #f8fafc;
+}
+
+.form input[type="text"]:focus {
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+  outline: none;
 }
 
 .form button {
-  background-color: #007BFF;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  align-content: center;
+  background-color: #4299e1;
   color: white;
-  padding: 10px 15px;
+  padding: 10px 30px;
+  height: 42px;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
-  font-size: 16px;
+  transition: all 0.2s;
+  margin-left: auto;
 }
 
 .form button:hover {
-  background-color: #0056b3;
+  background-color: #3182ce;
+  transform: translateY(-1px);
 }
 
+/* Table styling */
 .membersTable {
-  margin-top: 20px;
-  width: 100%;
-  background-color: #fff; /* White background for the table */
-  border-collapse: collapse;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.membersTable th, .membersTable td {
-  text-align: left;
-  padding: 12px;
-  border-bottom: 1px solid #ddd; /* Light grey border */
+  min-width: 100%;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
 }
 
 .membersTable th {
-  background-color: #007BFF; /* Blue background for headers */
-  color: white;
+  background-color: #f8fafc;
+  color: #4a5568;
+  font-weight: 600;
+  padding: 15px 20px;
+  border-bottom: 2px solid #e2e8f0;
+  text-align: left;
 }
 
-.membersTable tr:nth-child(even) {
-  background-color: #f2f2f2; /* Zebra striping for rows */
+.membersTable td {
+  padding: 12px 20px;
+  color: #2d3748;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: middle;
 }
 
 .membersTable tr:hover {
-  background-color: #ddd; /* Hover effect for rows */
+  background-color: #f8fafc;
 }
 
-/* Icon styles */
-.faTrash, .faEdit, .faSave {
+/* Action icons styling */
+.action-icons {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.action-icons svg {
   cursor: pointer;
-  margin-right: 10px;
+  font-size: 1.2rem;
+  transition: all 0.2s;
 }
 
-.faSave {
-  color: green;
+.action-icons .edit-icon {
+  color: #4299e1;
 }
 
-.faEdit {
-  color: #FFA500; /* Orange */
+.action-icons .delete-icon {
+  color: #f56565;
 }
 
-.faTrash {
-  color: red;
+.action-icons .save-icon {
+  color: #48bb78;
 }
 
-.membersTable {
-  margin-top: 20px;
+.action-icons svg:hover {
+  transform: scale(1.15);
+  opacity: 0.9;
+}
+
+/* Edit mode input styling */
+.membersTable input {
   width: 100%;
-  background-color: #fff; /* White background for the table */
-  border-collapse: collapse; /* This ensures that border lines between cells collapse into a single line */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  background-color: #f8fafc;
 }
 
-.membersTable th, .membersTable td {
-  text-align: left;
-  padding: 12px;
-  border: 1px solid #ddd; /* Adding borders to both th and td elements */
-  color: #005A9C;
+.membersTable input:focus {
+  border-color: #4299e1;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
 }
 
-.membersTable th {
-  background-color: #007BFF; /* Blue background for headers */
-  color: white;
+/* Loading state */
+.loading-state {
+  text-align: center;
+  padding: 20px;
+  color: #4a5568;
+  font-size: 1.1rem;
 }
 
-/* Optional: If you want to ensure there's no double border effect */
-.membersTable tr {
-  border-left: 1px solid #ddd;
-  border-right: 1px solid #ddd;
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 30px;
+  color: #4a5568;
+  background-color: #f8fafc;
+  border-radius: 8px;
 }
 
-/* To ensure the first cell of each row has a left border */
-.membersTable tr td:first-child, .membersTable tr th:first-child {
-  border-left: 1px solid #ddd;
-}
-
-/* To ensure the last cell of each row has a right border */
-.membersTable tr td:last-child, .membersTable tr th:last-child {
-  border-right: 1px solid #ddd;
-}
-
-/* Zebra striping for rows remains the same */
-.membersTable tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-/* Hover effect for rows */
-.membersTable tr:hover {
-  background-color: #ddd;
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .form {
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+  }
+  
+  .form p {
+    width: 100%;
+  }
+  
+  .form button {
+    width: 100%;
+    margin-top: 10px;
+  }
+  
+  .membersTable {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
 }

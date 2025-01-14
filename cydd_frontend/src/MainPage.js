@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import './MainPage.css';
 import { FaTrash, FaEdit, FaSave, FaRegEye } from 'react-icons/fa';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Header from './Header';
 
 const MainPage = () => {
   const [events, setEvents] = useState([]);
@@ -65,7 +66,10 @@ const MainPage = () => {
 
   return (
     <>
-      <div>
+      <div className="header-container">
+        <Header />
+      </div>
+      <div className="main-content">
         <table className="eventsTable">
           <thead>
             <tr>
@@ -102,7 +106,7 @@ const MainPage = () => {
                     <>
                       <FaEdit onClick={() => handleEdit(event)} />
                       <FaTrash onClick={() => handleDelete(event.id)} />
-                      <FaRegEye onClick={() => handleNavigateToEvent(event)} /> {/* View icon */}
+                      <FaRegEye onClick={() => handleNavigateToEvent(event)} />
                     </>
                   )}
                 </td>

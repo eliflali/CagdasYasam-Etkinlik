@@ -85,33 +85,115 @@ class TargetGroupSerializer(serializers.ModelSerializer):
         fields = '__all__'  # Include all fields from the model
 
 class EventSerializer(serializers.ModelSerializer):
-    manager_student = StudentSerializer(read_only=True)
-    manager_member = MemberSerializer(read_only=True)
-    native_departments = NativeDepartmentSerializer(many=True, read_only=True)
-    helper_departments = HelperDepartmentSerializer(many=True, read_only=True)
-    target_groups = TargetGroupSerializer(many=True, read_only=True)
-
     class Meta:
         model = Event
-        fields = '__all__'  # Include all fields from the model
+        fields = '__all__'
+
+    def create(self, validated_data):
+        # Pop the many-to-many fields and foreign key fields
+        target_groups = validated_data.pop('target_groups', [])
+        native_departments = validated_data.pop('native_departments', [])
+        helper_departments = validated_data.pop('helper_departments', [])
+
+        # Handle manager_student if it's a dictionary
+        manager_student = validated_data.get('manager_student')
+        if isinstance(manager_student, dict):
+            student_id = manager_student.get('id')
+            if student_id:
+                validated_data['manager_student'] = Student.objects.get(id=student_id)
+            else:
+                validated_data['manager_student'] = None
+
+        # Handle manager_member if it's a dictionary
+        manager_member = validated_data.get('manager_member')
+        if isinstance(manager_member, dict):
+            member_id = manager_member.get('id')
+            if member_id:
+                validated_data['manager_member'] = Member.objects.get(id=member_id)
+            else:
+                validated_data['manager_member'] = None
+
+        # Create the event instance without m2m fields
+        event = Event.objects.create(**validated_data)
+
+        # Set the many-to-many fields after creation
+        if target_groups:
+            event.target_groups.set(target_groups)
+        if native_departments:
+            event.native_departments.set(native_departments)
+        if helper_departments:
+            event.helper_departments.set(helper_departments)
+
+        return event
+
+    def update(self, instance, validated_data):
+        # Handle many-to-many fields separately
+        target_groups = validated_data.pop('target_groups', None)
+        native_departments = validated_data.pop('native_departments', None)
+        helper_departments = validated_data.pop('helper_departments', None)
+
+        # Handle manager_student if it's a dictionary
+        manager_student = validated_data.get('manager_student')
+        if isinstance(manager_student, dict):
+            student_id = manager_student.get('id')
+            if student_id:
+                validated_data['manager_student'] = Student.objects.get(id=student_id)
+            else:
+                validated_data['manager_student'] = None
+
+        # Handle manager_member if it's a dictionary
+        manager_member = validated_data.get('manager_member')
+        if isinstance(manager_member, dict):
+            member_id = manager_member.get('id')
+            if member_id:
+                validated_data['manager_member'] = Member.objects.get(id=member_id)
+            else:
+                validated_data['manager_member'] = None
+
+        # Update the instance with other fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        # Update many-to-many fields if provided
+        if target_groups is not None:
+            instance.target_groups.set(target_groups)
+        if native_departments is not None:
+            instance.native_departments.set(native_departments)
+        if helper_departments is not None:
+            instance.helper_departments.set(helper_departments)
+
+        return instance
 
 class EventAttendanceSerializer(serializers.ModelSerializer):
-    member = MemberSerializer(required=False)
-    student = StudentSerializer(required=False)
-
     class Meta:
         model = EventAttendance
-        fields = [
-            'member', 'student', 'event', 'event_point', 'personal_attendance_point',
-            'attendance_status_student', 'attendance_status_member', 'excuse'
-        ]
+        fields = ['id', 'member', 'event', 'event_point']
 
-    def validate(self, data):
-        """
-        Ensure that either a member or a student is set, but not both.
-        """
-        if data.get('member') and data.get('student'):
-            raise serializers.ValidationError("Attendance must be linked to either a member or a student, not both.")
-        if not data.get('member') and not data.get('student'):
-            raise serializers.ValidationError("Attendance must be linked to either a member or a student.")
-        return data
+    def validate_member(self, value):
+        try:
+            if isinstance(value, int):
+                return Member.objects.get(id=value)
+            return value
+        except Member.DoesNotExist:
+            raise serializers.ValidationError("Invalid member ID")
+
+    def validate_event(self, value):
+        try:
+            if isinstance(value, int):
+                return Event.objects.get(id=value)
+            return value
+        except Event.DoesNotExist:
+            raise serializers.ValidationError("Invalid event ID")
+
+    def create(self, validated_data):
+        # Check if attendance already exists
+        existing_attendance = EventAttendance.objects.filter(
+            member=validated_data['member'],
+            event=validated_data['event']
+        ).first()
+
+        if existing_attendance:
+            raise serializers.ValidationError("Member is already added to this event")
+
+        return super().create(validated_data)

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import logo from './assets/cydd_logo.jpg';
 import './QueryMember.css';
 import { FaTrash, FaEdit, FaSave } from 'react-icons/fa';
+import Header from './Header';
 
 const QueryMember = () => {
   const [searchParams, setSearchParams] = useState({ name: '', tc_number: '' });
@@ -11,22 +11,12 @@ const QueryMember = () => {
   const [editFormData, setEditFormData] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // Debounce timer to avoid excessive API calls
-  const debounce = (func, delay) => {
-    let debounceTimer;
-    return function (...args) {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => func.apply(this, args), delay);
-    };
-  };
-
   // Trigger the search dynamically based on name or tc_number input
   const handleSearchChange = (e) => {
     setSearchParams({
       ...searchParams,
       [e.target.name]: e.target.value,
     });
-    debouncedSearch();
   };
 
   // Search members with the current search params
@@ -43,8 +33,10 @@ const QueryMember = () => {
     }
   };
 
-  // Debounce search function
-  const debouncedSearch = debounce(fetchMembers, 500);
+  // Fetch all members when component mounts
+  useEffect(() => {
+    fetchMembers();
+  }, []);
 
   const handleEditChange = (e) => {
     setEditFormData({
@@ -83,76 +75,97 @@ const QueryMember = () => {
   };
 
   return (
-    <div className='page-container'>
-      <div className="formContainer">
-        <form className="form">
-          <p>
-            <label htmlFor="name">İsim Soyisim</label>
-            <input type="text" name="name" placeholder="İsim Soyisim" value={searchParams.name} onChange={handleSearchChange} />
-          </p>
-          <p>
-            <label htmlFor="tc_number">TC Numarası</label>
-            <input type="text" name="tc_number" placeholder="TC Numarası" value={searchParams.tc_number} onChange={handleSearchChange} />
-          </p>
-        </form>
+    <>
+        <div className="header-container">
+            <Header />
+        </div>
+        <div className="page-container">
+            <div className="formContainer">
+                <form className="form" style={{backgroundColor: 'white'}} onSubmit={(e) => {
+                    e.preventDefault();
+                    fetchMembers();
+                }}>
+                    <p>
+                        <label htmlFor="name">İsim Soyisim</label>
+                        <input 
+                            type="text" 
+                            name="name" 
+                            placeholder="İsim Soyisim" 
+                            value={searchParams.name} 
+                            onChange={handleSearchChange} 
+                        />
+                    </p>
+                    <p>
+                        <label htmlFor="tc_number">TC Numarası</label>
+                        <input 
+                            type="text" 
+                            name="tc_number" 
+                            placeholder="TC Numarası" 
+                            value={searchParams.tc_number} 
+                            onChange={handleSearchChange} 
+                        />
+                    </p>
+                    <button type="submit">Üye Ara</button>
+                </form>
 
-        {loading ? (
-          <p>Loading...</p>
-        ) : (
-          <table className="membersTable">
-            <thead>
-              <tr>
-                <th>İsim Soyisim</th>
-                <th>TC Numarası</th>
-                <th>Toplam Gönüllü Saat</th>
-                <th>Başlangıç Zamanı</th>
-                <th>Bitiş Zamanı</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {members.length > 0 ? (
-                members.map((member) => (
-                  <tr key={member.id}>
-                    {editableMemberId === member.id ? (
-                      <>
-                        <td><input type="text" name="name" value={editFormData.name} onChange={handleEditChange} /></td>
-                        <td><input type="text" name="tc_number" value={editFormData.tc_number} onChange={handleEditChange} /></td>
-                        <td><input type="number" name="total_volunteering_hours" value={editFormData.total_volunteering_hours} onChange={handleEditChange} /></td>
-                        <td><input type="datetime-local" name="start_time" value={editFormData.start_time} onChange={handleEditChange} /></td>
-                        <td><input type="datetime-local" name="end_time" value={editFormData.end_time} onChange={handleEditChange} /></td>
-                      </>
-                    ) : (
-                      <>
-                        <td>{member.name}</td>
-                        <td>{member.tc_number}</td>
-                        <td>{member.total_volunteering_hours}</td>
-                        <td>{member.start_time}</td>
-                        <td>{member.end_time}</td>
-                      </>
-                    )}
-                    <td>
-                      {editableMemberId === member.id ? (
-                        <FaSave onClick={handleUpdate} />
-                      ) : (
-                        <>
-                          <FaEdit onClick={() => handleEdit(member)} />
-                          <FaTrash onClick={() => handleDelete(member.id)} />
-                        </>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="6">No members found</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        )}
-      </div>
-    </div>
+                {loading ? (
+                    <div className="loading-state">Yükleniyor...</div>
+                ) : (
+                    <table className="membersTable">
+                        <thead>
+                            <tr>
+                                <th>İsim Soyisim</th>
+                                <th>TC Numarası</th>
+                                <th>Toplam Gönüllü Saat</th>
+                                <th>Başlangıç Zamanı</th>
+                                <th>Bitiş Zamanı</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {members.length > 0 ? (
+                                members.map((member) => (
+                                    <tr key={member.id}>
+                                        {editableMemberId === member.id ? (
+                                            <>
+                                                <td><input type="text" name="name" value={editFormData.name} onChange={handleEditChange} /></td>
+                                                <td><input type="text" name="tc_number" value={editFormData.tc_number} onChange={handleEditChange} /></td>
+                                                <td><input type="number" name="total_volunteering_hours" value={editFormData.total_volunteering_hours} onChange={handleEditChange} /></td>
+                                                <td><input type="datetime-local" name="start_time" value={editFormData.start_time} onChange={handleEditChange} /></td>
+                                                <td><input type="datetime-local" name="end_time" value={editFormData.end_time} onChange={handleEditChange} /></td>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <td>{member.name}</td>
+                                                <td>{member.tc_number}</td>
+                                                <td>{member.total_volunteering_hours}</td>
+                                                <td>{member.start_time}</td>
+                                                <td>{member.end_time}</td>
+                                            </>
+                                        )}
+                                        <td className="action-icons">
+                                            {editableMemberId === member.id ? (
+                                                <FaSave className="save-icon" onClick={handleUpdate} />
+                                            ) : (
+                                                <>
+                                                    <FaEdit className="edit-icon" onClick={() => handleEdit(member)} />
+                                                    <FaTrash className="delete-icon" onClick={() => handleDelete(member.id)} />
+                                                </>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="6" className="empty-state">Üye bulunamadı</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                )}
+            </div>
+        </div>
+    </>
   );
 };
 

@@ -1,50 +1,122 @@
 .header {
-    position: fixed; /* Makes the header fixed at the top */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 60px; /* Adjust height as needed */
-    background-color: white; /* Adjust background color */
+  width: 100%;
+  background-color: #f8f9fa;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  min-height: 80px;
+  position: relative;
+  z-index: 9999;
+}
 
-    
-  }
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+}
 
-  .header-top{
-    display: flex;
-    align-items: center;
-    text-align: center;
-    justify-content: center;
-    display: flex;
-    padding: 10px 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: adds a shadow effect */
+.header-logo-title {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-logo-title img {
+  width: 50px;
+  height: auto;
+}
+
+.header-logo-title h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.expand-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.expand-button:hover {
+  color: #333;
+}
+
+.navigationBar {
+  position: absolute;
+  width: 100%;
+  padding: 10px 20px;
+  border-top: 1px solid #ddd;
+  background-color: #fff;
+}
+
+.main-menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 100%;
+  overflow: visible;
+  padding-bottom: 5px;
+}
+
+.nav-dropdown {
+  min-width: 120px;
+  position: relative;
+}
+
+/* Style for Bootstrap dropdown button */
+.dropdown-toggle {
+  background-color: #4299e1 !important;
+  border: none !important;
+  padding: 8px 15px !important;
+  font-size: 0.9rem !important;
+  position: relative;
+  z-index: 9999;
+}
+
+.dropdown-toggle:hover {
+  background-color: #3182ce !important;
+}
+
+.dropdown-menu {
+  min-width: 200px !important;
+  padding: 8px 0 !important;
+  z-index: 10000 !important;
+}
+
+.dropdown-item {
+  
+  padding: 8px 15px !important;
+  font-size: 0.9rem !important;
+}
+
+.dropdown-item:hover {
+  background-color: #f0f0f0 !important;
+}
+
+/* Hide scrollbar but keep functionality */
+.main-menu::-webkit-scrollbar {
+  height: 0;
+  width: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .header-logo-title h3 {
+    font-size: 1rem;
   }
   
-  img {
-    margin-right: 20px;
+  .nav-dropdown {
+    min-width: 100px;
   }
-  
-  h3 {
-    margin: 0;
-    font-size: 1.5rem;
-    color:black
-  }
+}
 
-  .navigationBar {
-    width: 100%;
-    height: 60px; /* Adjust height as needed */
-    margin-top: 0px;
-    background-color: white; /* Adjust background color */
-    z-index: 1000; /* Ensures the header stays on top */
-    display: flex;
-    align-items: center;
-    text-align: center;
-    justify-content: center;
-    display: flex;
-    padding: 10px 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: adds a shadow effect */
-  }
-
-#dropdown-basic-button{
-    margin: 3px;
-    width:120px;
+/* Add new styles for dropdown container */
+.dropdown-menu.show {
+  position: absolute;
+  transform: none !important;
+  margin-top: 2px !important;
+  inset: auto !important;
 }

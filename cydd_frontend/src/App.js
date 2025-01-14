@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Switch } from 'react-router-dom';
-import Header from './Header'
+
 import LoginPage from './LoginPage';
 import MainPage from './MainPage';
 import AddMember from './AddMember';
@@ -15,11 +15,11 @@ import AddMemberToDepartmentProjectForm from './AddMemberToProjects';
 import AddTargetGroupForm from './AddTargetGroups';
 import AddStudentForm from './AddStudent'
 import AddStudentToDepartmentProjectForm from './AddStudentToProject';
+import StudentProfilePage from './StudentProfilePage';
 
 function App() {
   return (
     <>
-    <Header/>
     <Router>
       <Routes>
         <Route path="/" element={<LoginPage />} />
@@ -36,6 +36,7 @@ function App() {
         <Route path="/add-student-to-department-project" element={<AddStudentToDepartmentProjectForm/>} />
         <Route path="/add-target-group" element={<AddTargetGroupForm/>} />
         <Route path="/add-student" element={<AddStudentForm/>} />
+        <Route path="/student-profile/:id" element={<StudentProfilePage />} />
       </Routes>
     </Router>
     </>

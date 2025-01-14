@@ -31,7 +31,9 @@ from .views import (
     StudentListView,
     StudentUpdateDeleteAPIView,
     StudentDetailView,
-    StudentMembershipCreate
+    StudentMembershipCreate,
+    HelperDepartmentListView,
+    AddStudentToEventView,
 )
 
 urlpatterns = [
@@ -61,6 +63,7 @@ urlpatterns = [
     path('events_list/', EventListView.as_view(), name='events-list'),
     path('events/<int:pk>/', EventUpdateDeleteAPIView.as_view(), name='event-update-delete'),
     path('add_attendance/', AddMemberToEventView.as_view(), name='add-attendance'),
+    path('add_student_attendance/', AddStudentToEventView.as_view(), name='add-student-attendance'),
     path('events/<int:event_id>/attendees/', EventAttendeesView.as_view(), name='event-attendees'),
     path('events/<int:event_id>/remove-attendee/<int:member_id>/', RemoveAttendeeView.as_view(), name='remove-attendee'),
     
@@ -70,6 +73,7 @@ urlpatterns = [
     path('departments-create/', CombinedDepartmentCreate.as_view(), name='departments-create'),
     path('departments/', DepartmentListView.as_view(), name='departments-list'),
     path('native-departments/', NativeDepartmentListView.as_view(), name='native-departments-list'),
+    path('helper-departments/', HelperDepartmentListView.as_view(), name='helper-departments-list'),
 
     
     # Project URLs

@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useLocation, useNavigate } from 'react-router-dom'; // Import useNavigate instead of useHistory
 import './EventPage.css'; // Adjust the path as necessary
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 
-const EventPage = () => {
+const EventPage = ({ event, onClose }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [attendees, setAttendees] = useState([]);
     const [member, setMember] = useState(null);
     const [error, setError] = useState('');
-    const location = useLocation();
-    const navigate = useNavigate(); // Use useNavigate here
-    const event = location.state ? location.state.event : null;
+    const [isExpanded, setIsExpanded] = useState(false);
 
     useEffect(() => {
         if (event) {
@@ -24,8 +21,6 @@ const EventPage = () => {
     if (!event) {
         return <p>No event data!</p>;
     }
-
-    
 
     const fetchMemberDetails = async (memberId) => {
         try {
@@ -49,11 +44,9 @@ const EventPage = () => {
         }
     };
 
-    
-
     const searchMembers = async () => {
         try {
-            const response = await axios.get(`http://localhost:8000/members_list/?search=${searchTerm}`);
+            const response = await axios.get(`http://localhost:8000/student_list/?search=${searchTerm}`);
             setSearchResults(response.data);
         } catch (error) {
             console.error("Error searching members:", error);
@@ -89,18 +82,46 @@ const EventPage = () => {
     };
 
     return (
-        <>
-        <div className='event-details'>
-            <h1>{event.name}</h1>
-            <p>Date: {formatDate(event.date)}</p>
-            <p>Points: {event.point}</p>
-            <p>Location: {event.place}</p>
-            {/* Add additional content and functionality */}
-        </div>
-        
+        <div className="event-page">
+            <div className="event-details">
+                <h1>{event.name}</h1>
+                <div className="event-info">
+                    <p><strong>Tarih:</strong> {formatDate(event.date)}</p>
+                    <p><strong>Puan:</strong> {event.point}</p>
+                    <p><strong>Mekan:</strong> {event.place}</p>
+                </div>
+                
+                <button 
+                    className="expand-button"
+                    onClick={() => setIsExpanded(!isExpanded)}
+                >
+                    <span>Tüm Detaylar</span>
+                    <FontAwesomeIcon icon={isExpanded ? faChevronUp : faChevronDown} />
+                </button>
 
-        <div className='attendees-list'>
-                <h2 className='attendee-list-name'>Katılımcılar</h2>
+                <div className={`expanded-details ${isExpanded ? 'expanded' : ''}`}>
+                    <div className="details-grid">
+                        <p><strong>Başlangıç Saati:</strong> {event.start_time}</p>
+                        <p><strong>Bitiş Saati:</strong> {event.end_time}</p>
+                        <p><strong>Kategori:</strong> {event.category}</p>
+                        <p><strong>Etkinlik Tipi:</strong> {event.event_type}</p>
+                        <p><strong>Öğrenci Yöneticisi:</strong> {event.manager_student}</p>
+                        <p><strong>Üye Yöneticisi:</strong> {event.manager_member}</p>
+                        <p><strong>Hedef Gruplar:</strong> {event.target_groups}</p>
+                        <p><strong>Yerel Departmanlar:</strong> {event.native_departments.join(', ')}</p>
+                        <p><strong>Yardımcı Departmanlar:</strong> {event.helper_departments.join(', ')}</p>
+                        <p><strong>Diğer Katılımcılar:</strong> {event.attendant_from_other}</p>
+                        <p><strong>Bizden Katılımcılar:</strong> {event.attendant_from_us}</p>
+                    </div>
+                    <div className="explanation-section">
+                        <p><strong>Açıklama:</strong></p>
+                        <p className="explanation-text">{event.explanation}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="attendees-section">
+                <h2>Katılımcılar</h2>
                 <ul>
                     {attendees.map(attendee => (
                         <li className='member-info' key={attendee.id}>
@@ -113,25 +134,25 @@ const EventPage = () => {
                     ))}
                 </ul>
             </div>
-        
-            <div>
-            <input 
-                type="text" 
-                value={searchTerm} 
-                onChange={(e) => setSearchTerm(e.target.value)} 
-                placeholder="Eklenecek Katılımcı Ara" 
-            />
-            <button onClick={searchMembers}>Ara</button>
-            <ul className='member-addition-list'>
-                {searchResults.map(member => (
-                    <li className= "member-addition-list-elmt" key={member.id}>
-                        <strong className='member-name'>{member.name}</strong>
-                        <button className='add-to-event-button' onClick={() => addMemberToEvent(member.id)}>Etkinliğe Ekle</button>
-                    </li>
-                ))}
-            </ul>
+            
+            <div className="search-section">
+                <input 
+                    type="text" 
+                    value={searchTerm} 
+                    onChange={(e) => setSearchTerm(e.target.value)} 
+                    placeholder="Eklenecek Katılımcı Ara" 
+                />
+                <button onClick={searchMembers}>Ara</button>
+                <ul className='member-addition-list'>
+                    {searchResults.map(member => (
+                        <li className= "member-addition-list-elmt" key={member.id}>
+                            <strong className='member-name'>{member.name}</strong>
+                            <button className='add-to-event-button' onClick={() => addMemberToEvent(member.id)}>Etkinliğe Ekle</button>
+                        </li>
+                    ))}
+                </ul>
+            </div>
         </div>
-        </>
     );
 };
 

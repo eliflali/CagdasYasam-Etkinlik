@@ -208,23 +208,30 @@ class EventAttendeesView(APIView):
     
 class AddMemberToEventView(APIView):
     def post(self, request, *args, **kwargs):
+        # Ensure member is sent as integer
+        if isinstance(request.data.get('member'), dict):
+            request.data['member'] = request.data['member'].get('id')
+            
+        serializer = EventAttendanceSerializer(data=request.data)
+        if serializer.is_valid():
+            event_attendance = serializer.save()
+            member = event_attendance.member
+            
+            # Update member's points using the point field
+            member.points_collected += event_attendance.point  # Changed from points_gained to point
+            member.save()
+            
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class AddStudentToEventView(APIView):   
+    def post(self, request, *args, **kwargs):
         serializer = EventAttendanceSerializer(data=request.data)
         print(request.data)
         if serializer.is_valid():
-            # Save the EventAttendance instance
             event_attendance = serializer.save()
-            
-            # Fetch the Member instance related to the EventAttendance
-            member = event_attendance.member
-            
-            # Update the member's points_collected
-            member.points_collected += event_attendance.points_gained
-            member.save()
-            
-            # Return the updated EventAttendance data
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
-        # If the serializer is not valid, return an error response
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class AddStudentToEventView(APIView):
@@ -254,6 +261,10 @@ class AddStudentToEventView(APIView):
 class NativeDepartmentListView(generics.ListAPIView):
     queryset = NativeDepartment.objects.all()
     serializer_class = NativeDepartmentSerializer
+    
+class HelperDepartmentListView(generics.ListAPIView):
+    queryset = HelperDepartment.objects.all()
+    serializer_class = HelperDepartmentSerializer
     
 class NativeDepartmentCreate(generics.CreateAPIView):
     queryset = NativeDepartment.objects.all()
